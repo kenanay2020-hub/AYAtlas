@@ -6,6 +6,7 @@ import { HealthDashboard } from './components/HealthDashboard';
 import { TimelineExplorer } from './components/TimelineExplorer';
 import { ArchitectureExplorer } from './components/ArchitectureExplorer';
 import { AykenOSTechnicalAtlas } from './components/AykenOSTechnicalAtlas';
+import { ExecutionFlowCanvas } from './components/ExecutionFlowCanvas';
 import { PhaseExplorer } from './components/PhaseExplorer';
 import { EvidenceExplorer } from './components/EvidenceExplorer';
 import { InteractiveGovernanceGraph } from './components/InteractiveGovernanceGraph';
@@ -65,6 +66,10 @@ function AppContent() {
 
           {activeTab === 'technical-atlas' && (
             <AykenOSTechnicalAtlas />
+          )}
+
+          {activeTab === 'execution-flow' && (
+            <ExecutionFlowCanvas />
           )}
 
           {activeTab === 'architecture' && (
