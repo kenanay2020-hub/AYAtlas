@@ -5,6 +5,7 @@ import { OverviewDashboard } from './components/OverviewDashboard';
 import { HealthDashboard } from './components/HealthDashboard';
 import { TimelineExplorer } from './components/TimelineExplorer';
 import { ArchitectureExplorer } from './components/ArchitectureExplorer';
+import { AykenOSTechnicalAtlas } from './components/AykenOSTechnicalAtlas';
 import { PhaseExplorer } from './components/PhaseExplorer';
 import { EvidenceExplorer } from './components/EvidenceExplorer';
 import { InteractiveGovernanceGraph } from './components/InteractiveGovernanceGraph';
@@ -24,7 +25,7 @@ function AppContent() {
   const payloadDigest = snapshot?.identity.manifestDigest || 'sha256_digest_manifest';
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-cyan-500/30 selection:text-cyan-200 font-mono">
       {/* Top Status Bar */}
       <TopStatusBar
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -60,6 +61,10 @@ function AppContent() {
             <TimelineExplorer
               headSha={headSha}
             />
+          )}
+
+          {activeTab === 'technical-atlas' && (
+            <AykenOSTechnicalAtlas />
           )}
 
           {activeTab === 'architecture' && (

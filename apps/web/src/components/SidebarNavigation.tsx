@@ -13,6 +13,7 @@ import {
   BookOpen,
   ChevronRight,
   UserCheck,
+  Cpu,
 } from 'lucide-react';
 
 interface SidebarNavigationProps {
@@ -34,6 +35,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ activeTab,
     {
       groupTitle: 'EXPLORE',
       items: [
+        { id: 'technical-atlas', label: 'AykenOS Technical Atlas', icon: Cpu },
         { id: 'architecture', label: 'Architecture Map', icon: Layers },
         { id: 'graph', label: 'Governance Graph', icon: Network },
         { id: 'phases', label: 'Phase Catalog', icon: GitBranch },
