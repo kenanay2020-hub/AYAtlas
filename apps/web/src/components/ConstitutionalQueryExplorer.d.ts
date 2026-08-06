@@ -1,7 +1,5 @@
 import React from 'react';
-interface ConstitutionalQueryExplorerProps {
+export declare const ConstitutionalQueryExplorer: React.FC<{
     headSha: string;
-}
-export declare const ConstitutionalQueryExplorer: React.FC<ConstitutionalQueryExplorerProps>;
-export {};
+}>;
 //# sourceMappingURL=ConstitutionalQueryExplorer.d.ts.map

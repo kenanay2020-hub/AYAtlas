@@ -1,0 +1,8 @@
+import React from 'react';
+interface TopStatusBarProps {
+    onToggleSidebar: () => void;
+    isSidebarOpen: boolean;
+}
+export declare const TopStatusBar: React.FC<TopStatusBarProps>;
+export {};
+//# sourceMappingURL=TopStatusBar.d.ts.map

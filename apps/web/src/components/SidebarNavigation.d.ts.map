@@ -1,0 +1,1 @@
+{"version":3,"file":"SidebarNavigation.d.ts","sourceRoot":"","sources":["SidebarNavigation.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,OAAO,CAAC;AAgB1B,UAAU,sBAAsB;IAC9B,SAAS,EAAE,MAAM,CAAC;IAClB,YAAY,EAAE,CAAC,GAAG,EAAE,MAAM,KAAK,IAAI,CAAC;IACpC,MAAM,EAAE,OAAO,CAAC;CACjB;AAED,eAAO,MAAM,iBAAiB,EAAE,KAAK,CAAC,EAAE,CAAC,sBAAsB,CAiF9D,CAAC"}

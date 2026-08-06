@@ -1,131 +1,120 @@
 import React, { useState } from 'react';
-import { Navbar } from './components/Navbar';
+import { TopStatusBar } from './components/TopStatusBar';
+import { SidebarNavigation } from './components/SidebarNavigation';
 import { OverviewDashboard } from './components/OverviewDashboard';
 import { HealthDashboard } from './components/HealthDashboard';
 import { TimelineExplorer } from './components/TimelineExplorer';
 import { ArchitectureExplorer } from './components/ArchitectureExplorer';
 import { PhaseExplorer } from './components/PhaseExplorer';
 import { EvidenceExplorer } from './components/EvidenceExplorer';
-import { GovernanceKnowledgeGraph } from './components/GovernanceKnowledgeGraph';
+import { InteractiveGovernanceGraph } from './components/InteractiveGovernanceGraph';
 import { ConstitutionalQueryExplorer } from './components/ConstitutionalQueryExplorer';
 import { DriftExplorer } from './components/DriftExplorer';
 import { RepositoryIntelligence } from './components/RepositoryIntelligence';
 import { RoadmapExplorer } from './components/RoadmapExplorer';
+import { InteractiveLearningCenter } from './components/InteractiveLearningCenter';
 import { SourceInspectorDrawer } from './components/SourceInspectorDrawer';
 import { SnapshotProvider, useSnapshotContext } from './context/SnapshotContext';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedComponent, setSelectedComponent] = useState<any | null>(null);
-  const { headSha, snapshot } = useSnapshotContext();
-  const currentPhase = 24;
+  const { headSha, snapshot, detectedPhase } = useSnapshotContext();
   const payloadDigest = snapshot?.identity.manifestDigest || 'sha256_digest_manifest';
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-cyan-500/30 selection:text-cyan-200">
-      <Navbar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        headSha={headSha}
-        currentPhase={currentPhase}
+      {/* Top Status Bar */}
+      <TopStatusBar
+        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        isSidebarOpen={isSidebarOpen}
       />
 
-      <main className="flex-1 py-6">
-        {activeTab === 'overview' && (
-          <OverviewDashboard
-            currentPhase={currentPhase}
-            headSha={headSha}
-            payloadDigest={payloadDigest}
-            onSelectComponent={(comp: any) => setSelectedComponent(comp)}
-          />
-        )}
+      {/* Main Flex Layout: Sidebar + Main Content Viewport */}
+      <div className="flex-1 flex overflow-hidden">
+        <SidebarNavigation
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          isOpen={isSidebarOpen}
+        />
 
-        {activeTab === 'health' && (
-          <HealthDashboard
-            headSha={headSha}
-            currentPhase={currentPhase}
-          />
-        )}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+          {activeTab === 'overview' && (
+            <OverviewDashboard
+              currentPhase={detectedPhase}
+              headSha={headSha}
+              payloadDigest={payloadDigest}
+              onSelectComponent={(comp: any) => setSelectedComponent(comp)}
+            />
+          )}
 
-        {activeTab === 'timeline' && (
-          <TimelineExplorer
-            headSha={headSha}
-          />
-        )}
+          {activeTab === 'health' && (
+            <HealthDashboard
+              headSha={headSha}
+              currentPhase={detectedPhase}
+            />
+          )}
 
-        {activeTab === 'architecture' && (
-          <ArchitectureExplorer
-            onSelectComponent={(comp: any) => setSelectedComponent(comp)}
-          />
-        )}
+          {activeTab === 'timeline' && (
+            <TimelineExplorer
+              headSha={headSha}
+            />
+          )}
 
-        {activeTab === 'phases' && (
-          <PhaseExplorer
-            currentPhase={currentPhase}
-            headSha={headSha}
-          />
-        )}
+          {activeTab === 'architecture' && (
+            <ArchitectureExplorer
+              onSelectComponent={(comp: any) => setSelectedComponent(comp)}
+            />
+          )}
 
-        {activeTab === 'evidence' && (
-          <EvidenceExplorer
-            headSha={headSha}
-          />
-        )}
+          {activeTab === 'phases' && (
+            <PhaseExplorer
+              currentPhase={detectedPhase}
+              headSha={headSha}
+            />
+          )}
 
-        {activeTab === 'graph' && (
-          <GovernanceKnowledgeGraph
-            headSha={headSha}
-          />
-        )}
+          {activeTab === 'evidence' && (
+            <EvidenceExplorer
+              headSha={headSha}
+            />
+          )}
 
-        {activeTab === 'query' && (
-          <ConstitutionalQueryExplorer
-            headSha={headSha}
-          />
-        )}
+          {activeTab === 'graph' && (
+            <InteractiveGovernanceGraph />
+          )}
 
-        {activeTab === 'drift' && (
-          <DriftExplorer
-            headSha={headSha}
-          />
-        )}
+          {activeTab === 'query' && (
+            <ConstitutionalQueryExplorer
+              headSha={headSha}
+            />
+          )}
 
-        {activeTab === 'repo-intel' && (
-          <RepositoryIntelligence
-            headSha={headSha}
-          />
-        )}
+          {activeTab === 'drift' && (
+            <DriftExplorer
+              headSha={headSha}
+            />
+          )}
 
-        {activeTab === 'roadmaps' && (
-          <RoadmapExplorer
-            currentPhase={currentPhase}
-            headSha={headSha}
-          />
-        )}
+          {activeTab === 'repo-intel' && (
+            <RepositoryIntelligence
+              headSha={headSha}
+            />
+          )}
 
-        {activeTab === 'learning' && (
-          <div className="p-6 max-w-7xl mx-auto space-y-4">
-            <h2 className="text-xl font-bold text-slate-100">AykenOS Deep Learning Center</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="glass-panel p-5 border-cyan-500/30">
-                <h3 className="font-bold text-base text-cyan-300 mb-2">Path 1: Mechanism vs Policy</h3>
-                <p className="text-xs text-slate-400 mb-4">
-                  Learn why AykenOS separates Ring0 kernel execution mechanisms from Ring3 policy runtimes.
-                </p>
-                <span className="text-xs text-cyan-400 font-mono font-semibold">Lesson 1 / 4 Completed</span>
-              </div>
+          {activeTab === 'roadmaps' && (
+            <RoadmapExplorer
+              currentPhase={detectedPhase}
+              headSha={headSha}
+            />
+          )}
 
-              <div className="glass-panel p-5 border-indigo-500/30">
-                <h3 className="font-bold text-base text-indigo-300 mb-2">Path 2: Evidence & Authority</h3>
-                <p className="text-xs text-slate-400 mb-4">
-                  Understand why validator output does not equal accepted evidence and how exact-subject binding works.
-                </p>
-                <span className="text-xs text-indigo-400 font-mono font-semibold">Lesson 1 / 3 Completed</span>
-              </div>
-            </div>
-          </div>
-        )}
-      </main>
+          {activeTab === 'learning' && (
+            <InteractiveLearningCenter />
+          )}
+        </main>
+      </div>
 
       <SourceInspectorDrawer
         component={selectedComponent}

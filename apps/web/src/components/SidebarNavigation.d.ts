@@ -1,0 +1,9 @@
+import React from 'react';
+interface SidebarNavigationProps {
+    activeTab: string;
+    setActiveTab: (tab: string) => void;
+    isOpen: boolean;
+}
+export declare const SidebarNavigation: React.FC<SidebarNavigationProps>;
+export {};
+//# sourceMappingURL=SidebarNavigation.d.ts.map

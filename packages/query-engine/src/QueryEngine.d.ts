@@ -1,26 +1,27 @@
-import { SnapshotIdentity } from '@ayatlas/snapshot-model';
-import { ProvenanceRecord, ProvenanceEngine } from '@ayatlas/provenance-engine';
-import { GovernanceKnowledgeGraphEngine, GovernanceGraphEdge } from '@ayatlas/graph-engine';
 import { IngestedRepositorySnapshot } from '@ayatlas/repository-ingestor';
-export interface ConstitutionalAnswer {
-    query: string;
-    conclusion: string;
-    status: 'SUPPORTED' | 'PARTIAL' | 'CONTRADICTORY' | 'UNKNOWN' | 'DEMO_SUPPORTED';
-    directSources: ProvenanceRecord[];
-    appliedInvariants: string[];
-    reasoningPath: GovernanceGraphEdge[];
-    unresolvedQuestions: string[];
-    snapshotIdentity: SnapshotIdentity;
-    disclaimerNotice: string;
+export interface GroundedEvidenceReference {
+    path: string;
+    digest: string;
+    size: number;
+    snippet?: string;
 }
-export interface ConstitutionalQueryContext {
-    snapshot?: IngestedRepositorySnapshot;
-    provenanceEngine?: ProvenanceEngine;
-    graphEngine?: GovernanceKnowledgeGraphEngine;
+export interface ConstitutionalAnswerPackage {
+    queryText: string;
+    commitSha: string;
+    manifestDigest: string;
+    sourceMode: string;
+    status: string;
+    conclusion: string;
+    appliedInvariants: string[];
+    disclaimerNotice: string;
+    directSources: GroundedEvidenceReference[];
+    answerSummaryTr: string;
+    answerSummaryEn: string;
+    groundedFiles: GroundedEvidenceReference[];
+    reasoningChain: string[];
+    governanceStatus: 'RATIFIED' | 'UNDER_REVIEW' | 'REJECTED';
 }
 export declare class ConstitutionalQueryEngine {
-    private defaultGraphEngine;
-    constructor();
-    askConstitutionalQuery(query: string, context?: ConstitutionalQueryContext, fallbackHeadSha?: string): ConstitutionalAnswer;
+    askConstitutionalQuery(queryText: string, snapshot?: IngestedRepositorySnapshot, commitSha?: string): ConstitutionalAnswerPackage;
 }
 //# sourceMappingURL=QueryEngine.d.ts.map
