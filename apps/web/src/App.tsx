@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { OverviewDashboard } from './components/OverviewDashboard';
 import { HealthDashboard } from './components/HealthDashboard';
@@ -12,27 +12,14 @@ import { DriftExplorer } from './components/DriftExplorer';
 import { RepositoryIntelligence } from './components/RepositoryIntelligence';
 import { RoadmapExplorer } from './components/RoadmapExplorer';
 import { SourceInspectorDrawer } from './components/SourceInspectorDrawer';
-import { OfflineFixtureRepositorySource } from '@ayatlas/github-reader';
-import { KnowledgePipelineEngine } from '@ayatlas/knowledge-builder';
+import { SnapshotProvider, useSnapshotContext } from './context/SnapshotContext';
 
-export function App() {
+function AppContent() {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedComponent, setSelectedComponent] = useState<any | null>(null);
-  const [headSha, setHeadSha] = useState('d8018a2c3b4a5e6f7a8b9c0d1e2f3a4b5c6d7e8f');
-  const [currentPhase, setCurrentPhase] = useState(24);
-  const [payloadDigest, setPayloadDigest] = useState('');
-
-  useEffect(() => {
-    async function loadPipelineData() {
-      const source = new OfflineFixtureRepositorySource(headSha);
-      const engine = new KnowledgePipelineEngine(source);
-      const pipelineRes = await engine.runFullPipeline();
-
-      setPayloadDigest(pipelineRes.s5.metadata.payloadDigest);
-      setCurrentPhase(pipelineRes.s2.payload.currentPhase);
-    }
-    loadPipelineData();
-  }, [headSha]);
+  const { headSha, snapshot } = useSnapshotContext();
+  const currentPhase = 24;
+  const payloadDigest = snapshot?.identity.manifestDigest || 'sha256_digest_manifest';
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-cyan-500/30 selection:text-cyan-200">
@@ -146,5 +133,13 @@ export function App() {
         headSha={headSha}
       />
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <SnapshotProvider>
+      <AppContent />
+    </SnapshotProvider>
   );
 }

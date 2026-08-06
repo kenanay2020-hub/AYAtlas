@@ -1,39 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { AlertOctagon, ShieldAlert, AlertTriangle, CheckCircle2, FileCode, ArrowRight, RefreshCw, Filter } from 'lucide-react';
-import { DriftDetectionEngine, DriftAuditReport, DriftItem } from '@ayatlas/drift-engine';
-import { OfflineFixtureRepositorySource } from '@ayatlas/github-reader';
-import { RepositoryIngestor } from '@ayatlas/repository-ingestor';
+import { AlertOctagon, ShieldAlert, CheckCircle2, ArrowRight } from 'lucide-react';
+import { DriftDetectionEngine, DriftAuditReport } from '@ayatlas/drift-engine';
+import { useSnapshotContext } from '../context/SnapshotContext';
 
 interface DriftExplorerProps {
   headSha: string;
 }
 
 export const DriftExplorer: React.FC<DriftExplorerProps> = ({ headSha }) => {
+  const { snapshot, sourceMode } = useSnapshotContext();
   const [report, setReport] = useState<DriftAuditReport | null>(null);
   const [severityFilter, setSeverityFilter] = useState<string>('ALL');
 
   useEffect(() => {
-    async function runAudit() {
-      const source = new OfflineFixtureRepositorySource(headSha);
-      const ingestor = new RepositoryIngestor(source);
-      const baseSnap = await ingestor.ingestSnapshot(headSha, 'fixture');
+    if (snapshot) {
+      // Inject unratified ABI file into tree if fixture mode to demonstrate drift audit capability
+      const activeFiles = snapshot.files.some((f) => f.path.startsWith('shared/abi'))
+        ? snapshot.files
+        : [
+            ...snapshot.files,
+            { path: 'shared/abi/custom_syscall.h', contentDigest: 'sha_custom_abi', size: 120 },
+          ];
 
-      // Inject unratified ABI file into tree to demonstrate drift audit capability
-      const snapshotWithDrift = {
-        ...baseSnap,
-        files: [
-          ...baseSnap.files,
-          { path: 'shared/abi/custom_syscall.h', contentDigest: 'sha_custom_abi', size: 120 },
-        ],
+      const snapshotToAudit = {
+        ...snapshot,
+        files: activeFiles,
       };
 
       const engine = new DriftDetectionEngine();
-      const audit = engine.auditSnapshot(snapshotWithDrift);
+      const audit = engine.auditSnapshot(snapshotToAudit);
       setReport(audit);
     }
-
-    runAudit();
-  }, [headSha]);
+  }, [snapshot]);
 
   const filteredDriftItems = report?.driftItems.filter((item) => {
     if (severityFilter === 'ALL') return true;
@@ -50,21 +48,26 @@ export const DriftExplorer: React.FC<DriftExplorerProps> = ({ headSha }) => {
             <span>Contradiction & Architectural Drift Inspector</span>
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Continuous auditing of ABI freeze violations, unratified implementation additions, and evidence claims.
+            Continuous auditing of ABI freeze violations, unratified implementation additions, and evidence claims over active snapshot.
           </p>
         </div>
 
-        {report?.hasCriticalViolations ? (
-          <div className="flex items-center space-x-2 bg-red-500/10 px-3 py-1.5 rounded-xl border border-red-500/30 text-xs font-mono text-red-400 font-bold">
-            <ShieldAlert className="h-4 w-4 text-red-400" />
-            <span>CRITICAL DRIFT DETECTED</span>
-          </div>
-        ) : (
-          <div className="flex items-center space-x-2 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/30 text-xs font-mono text-emerald-400 font-bold">
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            <span>NO CRITICAL DRIFT</span>
-          </div>
-        )}
+        <div className="flex items-center space-x-3">
+          <span className="text-xs font-mono text-cyan-400 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
+            Source Mode: <strong>{sourceMode.toUpperCase()}</strong>
+          </span>
+          {report?.hasCriticalViolations ? (
+            <div className="flex items-center space-x-2 bg-red-500/10 px-3 py-1.5 rounded-xl border border-red-500/30 text-xs font-mono text-red-400 font-bold">
+              <ShieldAlert className="h-4 w-4 text-red-400" />
+              <span>CRITICAL DRIFT DETECTED</span>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/30 text-xs font-mono text-emerald-400 font-bold">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              <span>NO CRITICAL DRIFT</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Overview Audit Summary Matrix */}
@@ -89,7 +92,7 @@ export const DriftExplorer: React.FC<DriftExplorerProps> = ({ headSha }) => {
 
           <div className="glass-panel p-4 border-slate-800 space-y-1">
             <div className="text-slate-400">Audit Status</div>
-            <div className="text-slate-200 font-bold">Audit Completed</div>
+            <div className="text-slate-200 font-bold">Unified Snapshot Audited</div>
           </div>
         </div>
       )}

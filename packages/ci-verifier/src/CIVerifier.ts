@@ -1,4 +1,4 @@
-import { OfflineFixtureRepositorySource, ReadOnlyRepositorySource } from '@ayatlas/github-reader';
+import { OfflineFixtureRepositorySource, GitHubReadOnlyRepositorySource, LocalReadOnlyRepositorySource, ReadOnlyRepositorySource } from '@ayatlas/github-reader';
 import { RepositoryIngestor } from '@ayatlas/repository-ingestor';
 import { KnowledgePipelineEngine } from '@ayatlas/knowledge-builder';
 import { DriftDetectionEngine, DriftAuditReport } from '@ayatlas/drift-engine';
@@ -14,7 +14,7 @@ export interface VerificationGateResult {
 
 export interface CIVerificationReport {
   commitSha: string;
-  sourceMode: string;
+  sourceMode: 'fixture' | 'local' | 'github';
   verificationTimestamp: string;
   overallPassed: boolean;
   gates: VerificationGateResult[];
@@ -25,11 +25,20 @@ export interface CIVerificationReport {
 export class CIVerifier {
   async verifyCommit(
     commitSha = 'd8018a2c3b4a5e6f7a8b9c0d1e2f3a4b5c6d7e8f',
-    source?: ReadOnlyRepositorySource
+    sourceMode: 'fixture' | 'local' | 'github' = 'fixture',
+    localOrRepoPath?: string
   ): Promise<CIVerificationReport> {
-    const repoSource = source || new OfflineFixtureRepositorySource(commitSha);
+    let repoSource: ReadOnlyRepositorySource;
+    if (sourceMode === 'github') {
+      repoSource = new GitHubReadOnlyRepositorySource();
+    } else if (sourceMode === 'local') {
+      repoSource = new LocalReadOnlyRepositorySource(localOrRepoPath || '/Users/asel/Documents/AYAtlas');
+    } else {
+      repoSource = new OfflineFixtureRepositorySource(commitSha);
+    }
+
     const ingestor = new RepositoryIngestor(repoSource);
-    const snapshot = await ingestor.ingestSnapshot(commitSha, repoSource.isDemoMode() ? 'fixture' : 'local');
+    const snapshot = await ingestor.ingestSnapshot(commitSha, sourceMode);
 
     const gates: VerificationGateResult[] = [];
 
@@ -104,6 +113,7 @@ export class CIVerifier {
 
 - **Target Repository**: \`kenanay/AykenOS\`
 - **Locked Commit SHA**: \`${commitSha}\`
+- **Adapter Source Mode**: \`${sourceMode.toUpperCase()}\` ${repoSource.isDemoMode() ? '(DEMO DATA)' : '(LIVE REPOSITORY)'}
 - **Audit Timestamp**: \`${snapshot.observation.capturedAt}\`
 - **Overall Status**: **${overallPassed ? 'PASS' : 'FAIL'}**
 
@@ -117,7 +127,7 @@ ${gates.map((g) => `- **Gate ${g.gateNumber} [${g.passed ? 'PASS' : 'FAIL'}]**: 
 
     return {
       commitSha,
-      sourceMode: repoSource.isDemoMode() ? 'fixture' : 'active',
+      sourceMode,
       verificationTimestamp: snapshot.observation.capturedAt,
       overallPassed,
       gates,
