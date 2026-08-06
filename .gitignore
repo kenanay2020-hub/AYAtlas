@@ -1,0 +1,12 @@
+node_modules
+dist
+packages/*/dist
+apps/*/dist
+.turbo
+packages/*/.turbo
+apps/*/.turbo
+*.log
+.DS_Store
+AYAtlas-source.zip
+data/generated/*
+!data/generated/.gitkeep

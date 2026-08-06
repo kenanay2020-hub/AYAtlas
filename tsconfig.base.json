@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ayatlas/snapshot-model": ["packages/snapshot-model/src/index.ts"],
+      "@ayatlas/knowledge-model": ["packages/knowledge-model/src/index.ts"],
+      "@ayatlas/repository-parser": ["packages/repository-parser/src/index.ts"],
+      "@ayatlas/github-reader": ["packages/github-reader/src/index.ts"],
+      "@ayatlas/knowledge-builder": ["packages/knowledge-builder/src/index.ts"],
+      "@ayatlas/authority-resolver": ["packages/authority-resolver/src/index.ts"],
+      "@ayatlas/graph-engine": ["packages/graph-engine/src/index.ts"],
+      "@ayatlas/repository-ingestor": ["packages/repository-ingestor/src/index.ts"],
+      "@ayatlas/provenance-engine": ["packages/provenance-engine/src/index.ts"],
+      "@ayatlas/change-intelligence": ["packages/change-intelligence/src/index.ts"],
+      "@ayatlas/query-engine": ["packages/query-engine/src/index.ts"],
+      "@ayatlas/drift-engine": ["packages/drift-engine/src/index.ts"],
+      "@ayatlas/ci-verifier": ["packages/ci-verifier/src/index.ts"]
+    }
+  }
+}

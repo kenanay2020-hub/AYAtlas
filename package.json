@@ -1,0 +1,22 @@
+{
+  "name": "ayatlas-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "npm@10.8.2",
+  "scripts": {
+    "build:all": "turbo build",
+    "test": "vitest run",
+    "typecheck": "turbo typecheck",
+    "clean": "rimraf node_modules packages/*/dist packages/*/.turbo apps/*/.turbo apps/web/dist"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "devDependencies": {
+    "rimraf": "^5.0.7",
+    "turbo": "^2.10.8",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}
