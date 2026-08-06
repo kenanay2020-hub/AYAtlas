@@ -13,7 +13,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "baseUrl": ".",
-    "typeRoots": ["./node_modules/@types"],
     "paths": {
       "@ayatlas/snapshot-model": ["packages/snapshot-model/src/index.ts"],
       "@ayatlas/knowledge-model": ["packages/knowledge-model/src/index.ts"],
