@@ -3,8 +3,7 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "moduleResolution": "bundler",
-    "typeRoots": ["../../node_modules/@types", "node_modules/@types"]
+    "moduleResolution": "bundler"
   },
   "include": ["src/**/*"]
 }
