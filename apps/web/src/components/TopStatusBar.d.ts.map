@@ -1,1 +1,1 @@
-{"version":3,"file":"TopStatusBar.d.ts","sourceRoot":"","sources":["TopStatusBar.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,OAAO,CAAC;AAI1B,UAAU,iBAAiB;IACzB,eAAe,EAAE,MAAM,IAAI,CAAC;IAC5B,aAAa,EAAE,OAAO,CAAC;CACxB;AAED,eAAO,MAAM,YAAY,EAAE,KAAK,CAAC,EAAE,CAAC,iBAAiB,CAkGpD,CAAC"}
+{"version":3,"file":"TopStatusBar.d.ts","sourceRoot":"","sources":["TopStatusBar.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,OAAO,CAAC;AAI1B,UAAU,iBAAiB;IACzB,eAAe,EAAE,MAAM,IAAI,CAAC;IAC5B,aAAa,EAAE,OAAO,CAAC;CACxB;AAED,eAAO,MAAM,YAAY,EAAE,KAAK,CAAC,EAAE,CAAC,iBAAiB,CAwGpD,CAAC"}

@@ -1,5 +1,5 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { LayoutDashboard, Activity, GitCommit, Layers, Network, HelpCircle, AlertOctagon, GitBranch, ShieldCheck, Map, BookOpen, ChevronRight, } from 'lucide-react';
+import { LayoutDashboard, Activity, GitCommit, Layers, Network, HelpCircle, AlertOctagon, GitBranch, ShieldCheck, Map, BookOpen, ChevronRight, UserCheck, } from 'lucide-react';
 export const SidebarNavigation = ({ activeTab, setActiveTab, isOpen }) => {
     const menuGroups = [
         {
@@ -43,6 +43,6 @@ export const SidebarNavigation = ({ activeTab, setActiveTab, isOpen }) => {
                                 return (_jsxs("button", { onClick: () => setActiveTab(item.id), className: `w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-all ${isActive
                                         ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-bold shadow-sm'
                                         : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'}`, children: [_jsxs("div", { className: "flex items-center space-x-2.5", children: [_jsx(Icon, { className: `h-4 w-4 ${isActive ? 'text-cyan-400' : 'text-slate-500'}` }), _jsx("span", { children: item.label })] }), isActive && _jsx(ChevronRight, { className: "h-3.5 w-3.5 text-cyan-400" })] }, item.id));
-                            }) })] }, group.groupTitle))) }), _jsxs("div", { className: "p-4 border-t border-slate-800 text-[10px] text-slate-400 space-y-1", children: [_jsxs("div", { children: ["Target Repository: ", _jsx("strong", { className: "text-slate-300", children: "kenanay/AykenOS" })] }), _jsxs("div", { children: ["Constitution: ", _jsx("strong", { className: "text-emerald-400", children: "Ratified Phase-24" })] })] })] }));
+                            }) })] }, group.groupTitle))) }), _jsxs("div", { className: "p-4 border-t border-slate-800 text-[10px] text-slate-400 space-y-1.5 bg-slate-950/60", children: [_jsxs("div", { className: "flex items-center space-x-1.5 text-cyan-300 font-bold", children: [_jsx(UserCheck, { className: "h-3.5 w-3.5 text-cyan-400" }), _jsx("span", { children: "Geli\u015Ftiren / Mimar: Kenan AY" })] }), _jsxs("div", { children: ["Target Repository: ", _jsx("strong", { className: "text-slate-300", children: "kenanay/AykenOS" })] }), _jsxs("div", { children: ["Constitution: ", _jsx("strong", { className: "text-emerald-400", children: "Ratified Phase-24" })] })] })] }));
 };
 //# sourceMappingURL=SidebarNavigation.js.map

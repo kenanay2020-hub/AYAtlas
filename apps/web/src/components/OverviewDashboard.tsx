@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Cpu, Terminal, Layers, FileCode, CheckCircle2, AlertTriangle, Activity, Lock, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Cpu, Terminal, Layers, FileCode, CheckCircle2, AlertTriangle, Activity, Lock, ArrowRight, User } from 'lucide-react';
 import { MultiAxisStatus } from '@ayatlas/knowledge-model';
 
 interface OverviewDashboardProps {
@@ -38,15 +38,15 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       title: 'ABI & Syscall Boundary',
       codeRef: 'shared/abi, kernel/sys',
       status: 'FROZEN CONTRACT',
-      badgeClass: 'status-badge-operational',
-      desc: 'Frozen constitutional interface contract between Ring0 mechanism and Ring3 policy.',
+      badgeClass: 'status-badge-frozen',
+      desc: 'Shared Syscall ABI. Immutable syscall table numbers and anatomical headers.',
       componentId: 'syscall-abi',
-      paths: ['shared/abi/syscall_nums.h'],
+      paths: ['shared/abi/syscalls.h'],
     },
     {
-      title: 'Ring3 Userspace Policy',
-      codeRef: 'userspace/ (minimal, semantic-cli)',
-      status: 'IMPLEMENTED / BOUNDED',
+      title: 'Ring3 Policy Runtime',
+      codeRef: 'userspace/ (semantic-cli, runtimes)',
+      status: 'BOUNDED AUTHORITY',
       badgeClass: 'status-badge-bounded',
       desc: 'Userspace policy interface. Includes Semantic CLI and minimal round-trip binaries.',
       componentId: 'semantic-cli',
@@ -91,20 +91,24 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   ];
 
   return (
-    <div className="space-[#space] p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Top Banner */}
       <div className="glass-panel p-6 bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-slate-950/90 border-cyan-500/30">
         <div className="flex items-start justify-between">
           <div>
-            <div className="flex items-center space-x-3 mb-2">
+            <div className="flex flex-wrap items-center gap-3 mb-2">
               <span className="text-2xl font-bold text-slate-100">AykenOS System Status</span>
               <span className="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
                 ACTIVE PHASE: Phase-{currentPhase}
               </span>
+              <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 flex items-center space-x-1">
+                <User className="h-3.5 w-3.5 text-indigo-400" />
+                <span>Mimar & Geliştiren: Kenan AY</span>
+              </span>
             </div>
             <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
               AykenOS is an execution-centric operating system architecture separating minimal Ring0 mechanisms from Ring3 policies. 
-              Currently operating under Phase-24 exact-subject evidence planning and accepted-evidence boundary specifications.
+              Designed & Developed by <strong>Kenan AY</strong>. Operating under Phase-24 exact-subject evidence planning and accepted-evidence boundary specifications.
             </p>
           </div>
           <div className="text-right text-xs font-mono space-y-1 bg-slate-950/60 p-3 rounded-lg border border-slate-800">
@@ -125,7 +129,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <div className="glass-panel p-4 flex items-center space-x-4">
           <div className="h-10 w-10 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
             <Cpu className="h-5 w-5" />
@@ -139,12 +143,23 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
         <div className="glass-panel p-4 flex items-center space-x-4">
           <div className="h-10 w-10 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+            <Lock className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Syscall ABI</div>
+            <div className="text-lg font-bold text-slate-100">Frozen</div>
+            <div className="text-[11px] text-amber-400 font-mono">shared/abi</div>
+          </div>
+        </div>
+
+        <div className="glass-panel p-4 flex items-center space-x-4">
+          <div className="h-10 w-10 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 flex items-center justify-center">
             <Terminal className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Ring3 Userspace</div>
+            <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Ring3 Policy</div>
             <div className="text-lg font-bold text-slate-100">Bounded</div>
-            <div className="text-[11px] text-amber-400 font-mono">No General Authority</div>
+            <div className="text-[11px] text-indigo-400 font-mono">Semantic CLI</div>
           </div>
         </div>
 
@@ -153,57 +168,47 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <ShieldCheck className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Syscall ABI</div>
-            <div className="text-lg font-bold text-slate-100">Frozen Contract</div>
-            <div className="text-[11px] text-cyan-400 font-mono">Preserving Changes Only</div>
-          </div>
-        </div>
-
-        <div className="glass-panel p-4 flex items-center space-x-4">
-          <div className="h-10 w-10 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 flex items-center justify-center">
-            <Activity className="h-5 w-5" />
-          </div>
-          <div>
-            <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold">CI Integrity</div>
-            <div className="text-lg font-bold text-slate-100">20+ Workflows</div>
-            <div className="text-[11px] text-indigo-400 font-mono">5 Gate Families</div>
+            <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Evidence Status</div>
+            <div className="text-lg font-bold text-slate-100">Exact-Subject</div>
+            <div className="text-[11px] text-cyan-400 font-mono">Phase-24 Plan</div>
           </div>
         </div>
       </div>
 
-      {/* 8 Categories Health Grid */}
-      <div>
-        <h2 className="text-base font-bold text-slate-200 mb-3 flex items-center space-x-2">
-          <Layers className="h-4 w-4 text-cyan-400" />
-          <span>AykenOS System Categorization & Health Matrix</span>
+      {/* Component Grid */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-bold text-slate-100 flex items-center space-x-2">
+          <Layers className="h-5 w-5 text-cyan-400" />
+          <span>AykenOS Substrate Architecture Components</span>
         </h2>
-        <div className="grid grid-cols-2 gap-4">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {categories.map((cat, idx) => (
             <div
               key={idx}
-              onClick={() =>
-                onSelectComponent({
-                  id: cat.componentId,
-                  label: cat.title,
-                  category: cat.codeRef,
-                  description: cat.desc,
-                  paths: cat.paths,
-                  status: cat.status,
-                })
-              }
-              className="glass-panel-hover p-4 cursor-pointer flex flex-col justify-between"
+              onClick={() => onSelectComponent(cat)}
+              className="glass-panel p-5 cursor-pointer hover:border-cyan-500/40 transition-all flex flex-col justify-between space-y-3 group"
             >
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-sm text-slate-100">{cat.title}</span>
-                  <span className={cat.badgeClass}>{cat.status}</span>
+              <div className="space-y-2">
+                <div className="flex items-start justify-between">
+                  <h3 className="font-bold text-sm text-slate-100 group-hover:text-cyan-300 transition-colors">
+                    {cat.title}
+                  </h3>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${cat.badgeClass}`}>
+                    {cat.status}
+                  </span>
                 </div>
-                <div className="text-xs font-mono text-cyan-400/80 mb-2">{cat.codeRef}</div>
-                <p className="text-xs text-slate-400 leading-relaxed mb-3">{cat.desc}</p>
+                <div className="text-[11px] font-mono text-cyan-400 bg-slate-950 px-2 py-1 rounded border border-slate-800 truncate">
+                  {cat.codeRef}
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {cat.desc}
+                </p>
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs text-slate-500">
-                <span>View Component & Provenance</span>
-                <ArrowRight className="h-3.5 w-3.5 text-cyan-400" />
+
+              <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs font-mono text-slate-400 group-hover:text-cyan-400 transition-colors">
+                <span>Inspect Component Source</span>
+                <ArrowRight className="h-3.5 w-3.5 transform group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           ))}

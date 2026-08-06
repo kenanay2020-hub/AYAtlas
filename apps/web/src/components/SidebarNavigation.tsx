@@ -12,6 +12,7 @@ import {
   Map,
   BookOpen,
   ChevronRight,
+  UserCheck,
 } from 'lucide-react';
 
 interface SidebarNavigationProps {
@@ -94,8 +95,12 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ activeTab,
         ))}
       </div>
 
-      {/* Footer Substrate Reference */}
-      <div className="p-4 border-t border-slate-800 text-[10px] text-slate-400 space-y-1">
+      {/* Footer Developer Credit & Substrate Reference */}
+      <div className="p-4 border-t border-slate-800 text-[10px] text-slate-400 space-y-1.5 bg-slate-950/60">
+        <div className="flex items-center space-x-1.5 text-cyan-300 font-bold">
+          <UserCheck className="h-3.5 w-3.5 text-cyan-400" />
+          <span>Geliştiren / Mimar: Kenan AY</span>
+        </div>
         <div>Target Repository: <strong className="text-slate-300">kenanay/AykenOS</strong></div>
         <div>Constitution: <strong className="text-emerald-400">Ratified Phase-24</strong></div>
       </div>

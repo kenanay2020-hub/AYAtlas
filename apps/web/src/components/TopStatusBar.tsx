@@ -1,18 +1,18 @@
 import React from 'react';
-import { ShieldCheck, GitCommit, Layers, RefreshCw, Terminal, Globe, HardDrive } from 'lucide-react';
-import { useSnapshotContext, SourceMode } from '../context/SnapshotContext';
+import { ShieldCheck, GitCommit, Layers, RefreshCw, Terminal, Globe, HardDrive, User } from 'lucide-react';
+import { useSnapshotContext } from '../context/SnapshotContext';
 
 interface TopStatusBarProps {
   onToggleSidebar: () => void;
   isSidebarOpen: boolean;
 }
 
-export const TopStatusBar: React.FC<TopStatusBarProps> = ({ onToggleSidebar, isSidebarOpen }) => {
+export const TopStatusBar: React.FC<TopStatusBarProps> = ({ onToggleSidebar }) => {
   const { sourceMode, setSourceMode, headSha, detectedPhase, snapshot, isLoading, refreshSnapshot } = useSnapshotContext();
 
   return (
     <header className="h-14 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 font-mono text-xs">
-      {/* Left Branding & Toggle */}
+      {/* Left Branding & Developer Credit */}
       <div className="flex items-center space-x-3">
         <button
           onClick={onToggleSidebar}
@@ -30,10 +30,16 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({ onToggleSidebar, isS
             Digital Twin v1.0
           </span>
         </div>
+
+        {/* Developer Credit Tag */}
+        <div className="hidden sm:flex items-center space-x-1.5 bg-gradient-to-r from-cyan-500/10 to-indigo-500/10 px-2.5 py-1 rounded-lg border border-cyan-500/30 text-cyan-300 font-bold text-[11px]">
+          <User className="h-3.5 w-3.5 text-cyan-400" />
+          <span>Geliştiren / Mimar: <strong>Kenan AY</strong></span>
+        </div>
       </div>
 
       {/* Center Substrate Badges */}
-      <div className="hidden md:flex items-center space-x-4">
+      <div className="hidden lg:flex items-center space-x-4">
         {/* Source Mode Switcher */}
         <div className="flex items-center space-x-1 bg-slate-950 p-1 rounded-lg border border-slate-800">
           <button
