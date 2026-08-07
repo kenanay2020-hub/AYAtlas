@@ -18,6 +18,7 @@ import {
   CheckSquare,
   Box,
   GitCompare,
+  Terminal,
   X,
 } from 'lucide-react';
 
@@ -58,6 +59,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
     {
       groupTitle: 'ANALYZE',
       items: [
+        { id: 'test-runner', label: 'Unit Test Runner', icon: Terminal },
         { id: 'snapshot-diff', label: 'Snapshot Diff', icon: GitCompare },
         { id: 'ci-verifier', label: 'CI Verifier Gates', icon: CheckSquare },
         { id: 'query', label: 'Constitutional Query', icon: HelpCircle },

@@ -18,6 +18,7 @@ export const TAB_MAP: Record<string, { group: string; label: string }> = {
   phases: { group: 'EXPLORE', label: 'Phase Catalog' },
   evidence: { group: 'EXPLORE', label: 'Evidence Boundary' },
 
+  'test-runner': { group: 'ANALYZE', label: 'Unit Test Runner' },
   'snapshot-diff': { group: 'ANALYZE', label: 'Snapshot Diff' },
   'ci-verifier': { group: 'ANALYZE', label: 'CI Verifier Gates' },
   query: { group: 'ANALYZE', label: 'Constitutional Query' },
