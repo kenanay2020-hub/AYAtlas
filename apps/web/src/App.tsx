@@ -12,6 +12,7 @@ import { RepositoryDependencyGraph } from './components/RepositoryDependencyGrap
 import { PhaseExplorer } from './components/PhaseExplorer';
 import { EvidenceExplorer } from './components/EvidenceExplorer';
 import { InteractiveGovernanceGraph } from './components/InteractiveGovernanceGraph';
+import { SnapshotDiffViewer } from './components/SnapshotDiffViewer';
 import { CIVerifierDashboard } from './components/CIVerifierDashboard';
 import { ConstitutionalQueryExplorer } from './components/ConstitutionalQueryExplorer';
 import { DriftExplorer } from './components/DriftExplorer';
@@ -119,6 +120,10 @@ function AppContent() {
 
           {activeTab === 'graph' && (
             <InteractiveGovernanceGraph />
+          )}
+
+          {activeTab === 'snapshot-diff' && (
+            <SnapshotDiffViewer />
           )}
 
           {activeTab === 'ci-verifier' && (
