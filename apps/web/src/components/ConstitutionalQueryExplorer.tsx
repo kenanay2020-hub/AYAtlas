@@ -92,8 +92,8 @@ export const ConstitutionalQueryExplorer: React.FC<{ headSha: string }> = ({ hea
             <input
               type="text"
               value={queryInput}
-              onChange={(e) => setQueryInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAsk(queryInput)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQueryInput(e.target.value)}
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleAsk(queryInput)}
               placeholder="Ask any architectural, code, or governance question..."
               className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-cyan-500/50"
             />
@@ -109,7 +109,7 @@ export const ConstitutionalQueryExplorer: React.FC<{ headSha: string }> = ({ hea
         {/* Presets */}
         <div className="flex flex-wrap items-center gap-2 pt-2">
           <span className="text-[11px] text-slate-400">Preset Queries:</span>
-          {presetQueries.map((pq, idx) => (
+          {presetQueries.map((pq: string, idx: number) => (
             <button
               key={idx}
               onClick={() => handleAsk(pq)}
@@ -169,7 +169,7 @@ export const ConstitutionalQueryExplorer: React.FC<{ headSha: string }> = ({ hea
           <div className="space-y-2 text-xs">
             <span className="text-slate-400 text-[11px]">Reasoning Chain Path:</span>
             <div className="space-y-1">
-              {answer.reasoningChain.map((step, idx) => (
+              {answer.reasoningChain.map((step: string, idx: number) => (
                 <div key={idx} className="flex items-center space-x-2 text-cyan-300 bg-slate-950 p-2.5 rounded-lg border border-slate-800">
                   <ArrowRight className="h-3.5 w-3.5 text-cyan-400 flex-shrink-0" />
                   <span>{step}</span>
@@ -182,7 +182,7 @@ export const ConstitutionalQueryExplorer: React.FC<{ headSha: string }> = ({ hea
           <div className="space-y-2 text-xs">
             <span className="text-slate-400 text-[11px]">Grounded Repository Files ({answer.groundedFiles.length} matched):</span>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {answer.groundedFiles.map((gf, idx) => (
+              {answer.groundedFiles.map((gf: any, idx: number) => (
                 <div key={idx} className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
                   <div className="flex items-center space-x-2 text-slate-200 font-bold">
                     <FileText className="h-3.5 w-3.5 text-cyan-400" />
