@@ -16,6 +16,7 @@ import {
   Cpu,
   PlayCircle,
   CheckSquare,
+  Box,
   X,
 } from 'lucide-react';
 
@@ -46,6 +47,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
       items: [
         { id: 'technical-atlas', label: 'AykenOS Technical Atlas', icon: Cpu },
         { id: 'execution-flow', label: 'Execution Flow Canvas', icon: PlayCircle },
+        { id: 'repo-deps', label: 'Monorepo Topology', icon: Box },
         { id: 'architecture', label: 'Architecture Map', icon: Layers },
         { id: 'graph', label: 'Governance Graph', icon: Network },
         { id: 'phases', label: 'Phase Catalog', icon: GitBranch },

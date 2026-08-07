@@ -8,6 +8,7 @@ import { TimelineExplorer } from './components/TimelineExplorer';
 import { ArchitectureExplorer } from './components/ArchitectureExplorer';
 import { AykenOSTechnicalAtlas } from './components/AykenOSTechnicalAtlas';
 import { ExecutionFlowCanvas } from './components/ExecutionFlowCanvas';
+import { RepositoryDependencyGraph } from './components/RepositoryDependencyGraph';
 import { PhaseExplorer } from './components/PhaseExplorer';
 import { EvidenceExplorer } from './components/EvidenceExplorer';
 import { InteractiveGovernanceGraph } from './components/InteractiveGovernanceGraph';
@@ -76,6 +77,10 @@ function AppContent() {
 
           {activeTab === 'execution-flow' && (
             <ExecutionFlowCanvas />
+          )}
+
+          {activeTab === 'repo-deps' && (
+            <RepositoryDependencyGraph />
           )}
 
           {activeTab === 'architecture' && (

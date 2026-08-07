@@ -1,5 +1,5 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { LayoutDashboard, Activity, GitCommit, Layers, Network, HelpCircle, AlertOctagon, GitBranch, ShieldCheck, Map, BookOpen, ChevronRight, UserCheck, Cpu, PlayCircle, CheckSquare, X, } from 'lucide-react';
+import { LayoutDashboard, Activity, GitCommit, Layers, Network, HelpCircle, AlertOctagon, GitBranch, ShieldCheck, Map, BookOpen, ChevronRight, UserCheck, Cpu, PlayCircle, CheckSquare, Box, X, } from 'lucide-react';
 export const SidebarNavigation = ({ activeTab, setActiveTab, isOpen, onCloseMobile, }) => {
     const menuGroups = [
         {
@@ -15,6 +15,7 @@ export const SidebarNavigation = ({ activeTab, setActiveTab, isOpen, onCloseMobi
             items: [
                 { id: 'technical-atlas', label: 'AykenOS Technical Atlas', icon: Cpu },
                 { id: 'execution-flow', label: 'Execution Flow Canvas', icon: PlayCircle },
+                { id: 'repo-deps', label: 'Monorepo Topology', icon: Box },
                 { id: 'architecture', label: 'Architecture Map', icon: Layers },
                 { id: 'graph', label: 'Governance Graph', icon: Network },
                 { id: 'phases', label: 'Phase Catalog', icon: GitBranch },

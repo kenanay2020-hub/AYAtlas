@@ -6,6 +6,7 @@ export const TAB_MAP = {
     timeline: { group: 'OBSERVE', label: 'Evolution Timeline' },
     'technical-atlas': { group: 'EXPLORE', label: 'AykenOS Technical Atlas' },
     'execution-flow': { group: 'EXPLORE', label: 'Execution Flow Canvas' },
+    'repo-deps': { group: 'EXPLORE', label: 'Monorepo Topology' },
     architecture: { group: 'EXPLORE', label: 'Architecture Map' },
     graph: { group: 'EXPLORE', label: 'Governance Graph' },
     phases: { group: 'EXPLORE', label: 'Phase Catalog' },
