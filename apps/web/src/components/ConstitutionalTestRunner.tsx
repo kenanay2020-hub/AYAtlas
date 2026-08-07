@@ -251,7 +251,7 @@ export const ConstitutionalTestRunner: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                {suite.tests.map((test, tIdx) => (
+                {suite.tests.map((test: { name: string; assertion: string; passed: boolean }, tIdx: number) => (
                   <div key={tIdx} className="p-3 bg-slate-950 rounded-lg border border-slate-800 space-y-1">
                     <div className="flex items-center justify-between text-xs font-bold text-slate-200">
                       <span className="text-cyan-300">✓ {test.name}</span>
