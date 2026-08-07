@@ -1,31 +1,42 @@
-import { History, GitCommit, Flag, CheckCircle2, ShieldCheck, Cpu, ArrowRight, Lock } from 'lucide-react';
+import React from 'react';
+import { History, GitCommit, Flag, CheckCircle2, ShieldCheck, Cpu, ArrowRight, Lock, Activity, Database } from 'lucide-react';
+import { useSnapshotContext } from '../context/SnapshotContext';
 
 interface TimelineExplorerProps {
   headSha: string;
 }
 
 export const TimelineExplorer: React.FC<TimelineExplorerProps> = ({ headSha }) => {
+  const { snapshot, sourceMode, detectedPhase } = useSnapshotContext();
+
+  const activeObsDate = snapshot?.observation.capturedAt
+    ? new Date(snapshot.observation.capturedAt).toISOString().slice(0, 10)
+    : '2026-08-07';
+
+  const manifestHash = snapshot?.identity.manifestDigest || 'sha256_e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+
   const timelineEvents = [
     {
-      phase: 'Phase-24',
-      title: 'Exact-Subject Evidence Planning',
+      phase: `Phase-${detectedPhase}`,
+      title: 'Active Snapshot Substrate & Evidence Boundary',
       status: 'ACTIVE & RATIFIED',
       changes: [
-        'Added Invariant: Validator Output PASS != Accepted Evidence',
-        'Frozen Syscall ABI boundary maintained (zero ABI modifications allowed)',
-        'Expanded proofd exact-subject SHA binding rules',
+        `Grounded active repository snapshot containing ${snapshot?.files.length || 0} parsed files`,
+        `Manifest SHA-256 Digest: ${manifestHash.slice(0, 20)}...`,
+        'Invariant: Validator Output PASS != Accepted Evidence',
+        'Frozen Syscall ABI boundary maintained (`shared/abi`)',
         'Bounded Semantic CLI execution scope under Ring3 userspace',
       ],
       commitSha: headSha.slice(0, 8),
-      date: '2026-08-06',
+      date: activeObsDate,
     },
     {
       phase: 'Phase-23',
       title: 'BCIB Substrate & Syscall ABI Freeze',
       status: 'COMPLETED & FROZEN',
       changes: [
-        'Frozen Ring0 kernel syscall table (`shared/abi/syscall_nums.h`)',
-        'Implemented BCIB substrate typed memory layout',
+        'Frozen Ring0 kernel syscall table (`shared/abi/syscalls.h`)',
+        'Implemented BCIB substrate typed memory layout (`ayken-core/crates/bcib`)',
         'Ratified Non-Intervention & Isolation Policy',
       ],
       commitSha: '4fa9c813',
@@ -36,7 +47,7 @@ export const TimelineExplorer: React.FC<TimelineExplorerProps> = ({ headSha }) =
       title: 'Evidence Verification Subsystem',
       status: 'COMPLETED',
       changes: [
-        'Created proofd verification engine',
+        'Created proofd verification engine (`proofd/src/main.rs`)',
         'Established 8-Stage Sequential Evidence Verification Chain',
       ],
       commitSha: '9c8a7b6a',
@@ -45,9 +56,9 @@ export const TimelineExplorer: React.FC<TimelineExplorerProps> = ({ headSha }) =
   ];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-6 max-w-7xl mx-auto space-y-6 font-mono">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-100 flex items-center space-x-2">
             <History className="h-5 w-5 text-cyan-400" />
@@ -60,7 +71,20 @@ export const TimelineExplorer: React.FC<TimelineExplorerProps> = ({ headSha }) =
 
         <div className="flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800 text-xs font-mono">
           <span className="text-slate-400">Timeline Range:</span>
-          <span className="text-cyan-400 font-bold">Phase-0 $\rightarrow$ Phase-24</span>
+          <span className="text-cyan-400 font-bold">Phase-0 $\rightarrow$ Phase-{detectedPhase}</span>
+        </div>
+      </div>
+
+      {/* Dynamic Substrate Digest Banner */}
+      <div className="glass-panel p-4 bg-slate-950/80 border-slate-800 flex flex-wrap items-center justify-between text-xs gap-3">
+        <div className="flex items-center space-x-3">
+          <Database className="h-4 w-4 text-cyan-400 flex-shrink-0" />
+          <span className="text-slate-300">
+            Observation Substrate Mode: <strong className="text-cyan-400">{sourceMode.toUpperCase()}</strong> | Files: <strong>{snapshot?.files.length || 0}</strong>
+          </span>
+        </div>
+        <div className="text-[11px] text-cyan-400 font-mono truncate">
+          Snapshot Manifest: {manifestHash.slice(0, 24)}...
         </div>
       </div>
 
@@ -74,7 +98,7 @@ export const TimelineExplorer: React.FC<TimelineExplorerProps> = ({ headSha }) =
             </div>
 
             <div className="glass-panel p-6 border-slate-800 space-y-4 hover:border-cyan-500/40 transition-all">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-2">
                 <div className="flex items-center space-x-3 font-mono text-xs">
                   <span className="px-3 py-1 rounded-full font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
                     {event.phase}
@@ -84,7 +108,7 @@ export const TimelineExplorer: React.FC<TimelineExplorerProps> = ({ headSha }) =
 
                 <div className="flex items-center space-x-3 text-xs font-mono">
                   <span className="text-slate-500">{event.date}</span>
-                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/30">
+                  <span className="px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/30 text-[11px]">
                     {event.status}
                   </span>
                 </div>

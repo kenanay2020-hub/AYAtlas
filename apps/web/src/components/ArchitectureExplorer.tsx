@@ -1,11 +1,14 @@
 import React from 'react';
-import { Layers, ShieldCheck, Terminal, Cpu, Database, Activity, Lock, ArrowRight } from 'lucide-react';
+import { Layers, ShieldCheck, Terminal, Cpu, Database, Activity, Lock, ArrowRight, CheckCircle2, FileCode } from 'lucide-react';
+import { useSnapshotContext } from '../context/SnapshotContext';
 
 interface ArchitectureExplorerProps {
   onSelectComponent: (comp: any) => void;
 }
 
 export const ArchitectureExplorer: React.FC<ArchitectureExplorerProps> = ({ onSelectComponent }) => {
+  const { snapshot, sourceMode } = useSnapshotContext();
+
   const layers = [
     {
       ring: 'User / Intent Interface',
@@ -24,7 +27,7 @@ export const ArchitectureExplorer: React.FC<ArchitectureExplorerProps> = ({ onSe
         { id: 'ai-runtime', label: 'AI Runtime', path: 'userspace/ai-runtime', status: 'BOUNDED / NO AI AUTHORITY' },
         { id: 'bcib-runtime', label: 'BCIB Runtime', path: 'userspace/bcib-runtime', status: 'IMPLEMENTED' },
         { id: 'dsl-parser', label: 'DSL Parser', path: 'userspace/dsl-parser', status: 'IMPLEMENTED' },
-        { id: 'proofd', label: 'proofd Service', path: 'userspace/proofd', status: 'OPERATIONAL' },
+        { id: 'proofd', label: 'proofd Service', path: 'proofd', status: 'OPERATIONAL' },
         { id: 'libayken', label: 'libayken', path: 'userspace/libayken', status: 'OPERATIONAL' },
       ],
     },
@@ -69,22 +72,28 @@ export const ArchitectureExplorer: React.FC<ArchitectureExplorerProps> = ({ onSe
     },
   ];
 
+  // Helper to dynamically match active snapshot files for a given component path
+  const getComponentSnapshotFiles = (compPath: string) => {
+    if (!snapshot) return [];
+    return snapshot.files.filter((f) => f.path.startsWith(compPath) || f.path.includes(compPath));
+  };
+
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-6 max-w-7xl mx-auto space-y-6 font-mono">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-100 flex items-center space-x-2">
             <Layers className="h-5 w-5 text-cyan-400" />
             <span>AykenOS Layered Architecture Explorer</span>
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Visualizing the strict separation between Ring3 policy runtimes and minimal Ring0 execution mechanism kernel.
+            Dynamically matching active repository snapshot file tree against minimal Ring0 execution mechanisms and Ring3 policy runtimes.
           </p>
         </div>
         <div className="flex items-center space-x-4 text-xs font-mono">
           <span className="flex items-center space-x-1 text-emerald-400">
             <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
-            <span>Operational</span>
+            <span>Verified Snapshot Evidence</span>
           </span>
           <span className="flex items-center space-x-1 text-amber-400">
             <span className="h-2 w-2 rounded-full bg-amber-400"></span>
@@ -97,6 +106,16 @@ export const ArchitectureExplorer: React.FC<ArchitectureExplorerProps> = ({ onSe
         </div>
       </div>
 
+      {/* Active Substrate Banner */}
+      <div className="p-3 bg-slate-900/90 border border-slate-800 rounded-xl flex items-center justify-between text-xs">
+        <span className="text-slate-300">
+          Substrate Observation Mode: <strong className="text-cyan-400">{sourceMode.toUpperCase()}</strong> — Dynamically parsed <strong>{snapshot?.files.length || 0}</strong> repository files.
+        </span>
+        <span className="text-[11px] text-slate-400 bg-slate-950 px-2.5 py-1 rounded border border-slate-800">
+          Phase-24 Governance Substrate
+        </span>
+      </div>
+
       {/* Layer Stack */}
       <div className="space-y-4">
         {layers.map((layer, idx) => (
@@ -104,39 +123,63 @@ export const ArchitectureExplorer: React.FC<ArchitectureExplorerProps> = ({ onSe
             key={idx}
             className={`p-5 rounded-xl border ${layer.color} transition-all duration-300 relative`}
           >
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex flex-wrap items-center justify-between mb-3 gap-2">
               <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider font-semibold">
                 {layer.ring}
               </span>
               <span className="text-sm font-bold text-slate-200">{layer.name}</span>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              {layer.components.map((comp) => (
-                <div
-                  key={comp.id}
-                  onClick={() =>
-                    onSelectComponent({
-                      id: comp.id,
-                      label: comp.label,
-                      category: layer.ring,
-                      description: `System component ${comp.label} located in ${comp.path}`,
-                      paths: [comp.path],
-                      status: comp.status,
-                    })
-                  }
-                  className="bg-slate-900/90 border border-slate-800 hover:border-cyan-500/50 p-3 rounded-lg cursor-pointer transition-all duration-200 group"
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-semibold text-xs text-slate-100 group-hover:text-cyan-300">
-                      {comp.label}
-                    </span>
-                    <ArrowRight className="h-3 w-3 text-slate-600 group-hover:text-cyan-400 transition-transform group-hover:translate-x-0.5" />
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+              {layer.components.map((comp) => {
+                const matchedFiles = getComponentSnapshotFiles(comp.path);
+                const hasMatched = matchedFiles.length > 0;
+                const totalBytes = matchedFiles.reduce((acc, f) => acc + f.size, 0);
+
+                return (
+                  <div
+                    key={comp.id}
+                    onClick={() =>
+                      onSelectComponent({
+                        id: comp.id,
+                        label: comp.label,
+                        category: layer.ring,
+                        description: `System component ${comp.label} located in ${comp.path}. Verified in active snapshot (${matchedFiles.length} files).`,
+                        paths: [comp.path],
+                        status: comp.status,
+                      })
+                    }
+                    className="bg-slate-900/90 border border-slate-800 hover:border-cyan-500/50 p-4 rounded-xl cursor-pointer transition-all duration-200 group space-y-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-xs text-slate-100 group-hover:text-cyan-300">
+                        {comp.label}
+                      </span>
+                      <ArrowRight className="h-3.5 w-3.5 text-slate-600 group-hover:text-cyan-400 transition-transform group-hover:translate-x-0.5" />
+                    </div>
+
+                    <div className="text-[11px] font-mono text-slate-400 bg-slate-950 px-2 py-1 rounded border border-slate-800 truncate">
+                      {comp.path}
+                    </div>
+
+                    {/* Dynamic Snapshot Match Badge */}
+                    <div className="flex items-center justify-between text-[10px] pt-1 font-mono">
+                      <span className={`px-2 py-0.5 rounded font-bold border flex items-center space-x-1 ${
+                        hasMatched
+                          ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                          : 'bg-slate-950 text-slate-400 border-slate-800'
+                      }`}>
+                        <CheckCircle2 className="h-3 w-3" />
+                        <span>{hasMatched ? `${matchedFiles.length} SNAPSHOT FILES` : 'SIMULATED'}</span>
+                      </span>
+
+                      {hasMatched && (
+                        <span className="text-slate-400">{(totalBytes / 1024).toFixed(1)} KB</span>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-[11px] font-mono text-slate-400">{comp.path}</div>
-                  <div className="mt-2 text-[10px] font-mono text-cyan-400/90">{comp.status}</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         ))}
