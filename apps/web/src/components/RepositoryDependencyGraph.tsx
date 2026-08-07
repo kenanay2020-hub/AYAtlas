@@ -188,7 +188,7 @@ export const RepositoryDependencyGraph: React.FC = () => {
         {/* Layer Filter Controls */}
         <div className="flex items-center space-x-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800 text-xs">
           <span className="text-slate-400 text-[11px] px-2">Layer:</span>
-          {['ALL', ...layers].map((l) => (
+          {['ALL', ...layers].map((l: string) => (
             <button
               key={l}
               onClick={() => setFilterLayer(l)}
@@ -206,10 +206,10 @@ export const RepositoryDependencyGraph: React.FC = () => {
 
       {/* Main Grid: Interactive Canvas & Detail Inspector */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Package Node Grid (2 columns on lg) */}
+        {/* Package Node Grid */}
         <div className="lg:col-span-2 space-y-4">
-          {layers.map((layerName) => {
-            const layerPkgs = filteredPackages.filter((p) => p.layer === layerName);
+          {layers.map((layerName: string) => {
+            const layerPkgs = filteredPackages.filter((p: MonorepoPackageNode) => p.layer === layerName);
             if (layerPkgs.length === 0) return null;
 
             return (
@@ -222,7 +222,7 @@ export const RepositoryDependencyGraph: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {layerPkgs.map((pkg) => {
+                  {layerPkgs.map((pkg: MonorepoPackageNode) => {
                     const isSelected = pkg.id === selectedNodeId;
                     return (
                       <div
@@ -296,7 +296,7 @@ export const RepositoryDependencyGraph: React.FC = () => {
                 {selectedNode.dependencies.length === 0 ? (
                   <span className="text-xs text-slate-500 italic">None (Root Substrate)</span>
                 ) : (
-                  selectedNode.dependencies.map((dep, idx) => (
+                  selectedNode.dependencies.map((dep: string, idx: number) => (
                     <span
                       key={idx}
                       onClick={() => setSelectedNodeId(dep)}
@@ -318,7 +318,7 @@ export const RepositoryDependencyGraph: React.FC = () => {
                 {selectedNode.dependents.length === 0 ? (
                   <span className="text-xs text-slate-500 italic">None (Top Application Target)</span>
                 ) : (
-                  selectedNode.dependents.map((dep, idx) => (
+                  selectedNode.dependents.map((dep: string, idx: number) => (
                     <span
                       key={idx}
                       onClick={() => setSelectedNodeId(dep)}
