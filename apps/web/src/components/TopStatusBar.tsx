@@ -1,13 +1,14 @@
 import React from 'react';
-import { ShieldCheck, GitCommit, Layers, RefreshCw, Terminal, Globe, HardDrive, User } from 'lucide-react';
+import { ShieldCheck, GitCommit, Layers, RefreshCw, Terminal, Globe, HardDrive, User, Search } from 'lucide-react';
 import { useSnapshotContext } from '../context/SnapshotContext';
 
 interface TopStatusBarProps {
   onToggleSidebar: () => void;
   isSidebarOpen: boolean;
+  onOpenSearch?: () => void;
 }
 
-export const TopStatusBar: React.FC<TopStatusBarProps> = ({ onToggleSidebar }) => {
+export const TopStatusBar: React.FC<TopStatusBarProps> = ({ onToggleSidebar, onOpenSearch }) => {
   const { sourceMode, setSourceMode, headSha, detectedPhase, snapshot, isLoading, refreshSnapshot } = useSnapshotContext();
 
   return (
@@ -36,6 +37,18 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({ onToggleSidebar }) =
           <User className="h-3.5 w-3.5 text-cyan-400" />
           <span>Geliştiren / Mimar: <strong>Kenan AY</strong></span>
         </div>
+
+        {/* Search Trigger Button */}
+        {onOpenSearch && (
+          <button
+            onClick={onOpenSearch}
+            className="flex items-center space-x-1.5 px-3 py-1 bg-slate-950 hover:bg-slate-800 text-slate-300 rounded-lg border border-slate-800 transition-colors text-xs font-semibold"
+          >
+            <Search className="h-3.5 w-3.5 text-cyan-400" />
+            <span className="hidden md:inline">Code Search</span>
+            <kbd className="hidden md:inline text-[9px] bg-slate-900 px-1.5 py-0.5 rounded border border-slate-700 text-slate-400">⌘K</kbd>
+          </button>
+        )}
       </div>
 
       {/* Center Substrate Badges */}
@@ -65,7 +78,7 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({ onToggleSidebar }) =
           <button
             onClick={() => setSourceMode('github')}
             className={`px-2.5 py-1 rounded text-[11px] font-semibold flex items-center space-x-1 transition-colors ${
-              sourceMode === 'github' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'text-slate-400 hover:text-slate-200'
+              sourceMode === 'github' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             <Globe className="h-3 w-3" />
@@ -73,41 +86,29 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({ onToggleSidebar }) =
           </button>
         </div>
 
-        {/* Head SHA */}
-        <div className="flex items-center space-x-1.5 text-slate-300 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">
-          <GitCommit className="h-3.5 w-3.5 text-cyan-400" />
-          <span>SHA:</span>
-          <span className="text-cyan-400 font-bold">{headSha.slice(0, 8)}</span>
-        </div>
-
-        {/* Phase */}
-        <div className="flex items-center space-x-1.5 text-slate-300 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">
-          <Layers className="h-3.5 w-3.5 text-indigo-400" />
-          <span>Phase:</span>
-          <span className="text-indigo-400 font-bold">{detectedPhase}</span>
-        </div>
-
-        {/* Read Only Protection Badge */}
-        <div className="flex items-center space-x-1.5 text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/30 font-bold">
-          <ShieldCheck className="h-3.5 w-3.5" />
-          <span>READ-ONLY ISOLATED</span>
+        {/* Current Phase Badge */}
+        <div className="flex items-center space-x-1.5 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">
+          <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+          <span>Phase: <strong className="text-cyan-400">{detectedPhase}</strong></span>
         </div>
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-3">
+        <div className="hidden md:flex items-center space-x-1.5 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">
+          <GitCommit className="h-3.5 w-3.5 text-indigo-400" />
+          <span className="text-slate-400">SHA:</span>
+          <span className="font-mono text-cyan-300 font-bold">{headSha.slice(0, 8)}</span>
+        </div>
+
         <button
           onClick={refreshSnapshot}
           disabled={isLoading}
           className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors disabled:opacity-50"
-          title="Refresh Snapshot"
+          title="Refresh Substrate Snapshot"
         >
-          <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-cyan-400' : ''}`} />
+          <RefreshCw className={`h-4 w-4 text-cyan-400 ${isLoading ? 'animate-spin' : ''}`} />
         </button>
-
-        <span className="text-[11px] font-mono text-slate-400 hidden sm:inline">
-          Files: <strong className="text-slate-200">{snapshot?.files.length || 0}</strong>
-        </span>
       </div>
     </header>
   );

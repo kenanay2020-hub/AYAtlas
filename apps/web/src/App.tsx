@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TopStatusBar } from './components/TopStatusBar';
 import { SidebarNavigation } from './components/SidebarNavigation';
 import { BreadcrumbNav } from './components/BreadcrumbNav';
@@ -19,14 +19,28 @@ import { RepositoryIntelligence } from './components/RepositoryIntelligence';
 import { RoadmapExplorer } from './components/RoadmapExplorer';
 import { InteractiveLearningCenter } from './components/InteractiveLearningCenter';
 import { SourceInspectorDrawer } from './components/SourceInspectorDrawer';
+import { InvariantCodeSearchModal } from './components/InvariantCodeSearchModal';
 import { SnapshotProvider, useSnapshotContext } from './context/SnapshotContext';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState<any | null>(null);
   const { headSha, snapshot, detectedPhase } = useSnapshotContext();
   const payloadDigest = snapshot?.identity.manifestDigest || 'sha256_digest_manifest';
+
+  // Global Cmd+K / Ctrl+K keyboard shortcut listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-cyan-500/30 selection:text-cyan-200 font-mono">
@@ -34,6 +48,7 @@ function AppContent() {
       <TopStatusBar
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         isSidebarOpen={isSidebarOpen}
+        onOpenSearch={() => setIsSearchOpen(true)}
       />
 
       {/* Main Flex Layout: Sidebar + Main Content Viewport */}
@@ -145,6 +160,11 @@ function AppContent() {
         component={selectedComponent}
         onClose={() => setSelectedComponent(null)}
         headSha={headSha}
+      />
+
+      <InvariantCodeSearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
       />
     </div>
   );
