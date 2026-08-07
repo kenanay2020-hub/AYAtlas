@@ -1,0 +1,1 @@
+{"version":3,"file":"phase-pointer-parser.d.ts","sourceRoot":"","sources":["phase-pointer-parser.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,kBAAkB,GAAG;IAC/B,KAAK,EAAE,MAAM,CAAC;IACd,GAAG,EAAE,MAAM,CAAC;IACZ,MAAM,EAAE,SAAS,GAAG,aAAa,GAAG,WAAW,GAAG,aAAa,CAAC;CACjE,CAAC;AAEF;;;;;;;;;GASG;AACH,wBAAgB,iBAAiB,CAAC,OAAO,EAAE,MAAM,GAAG,SAAS,GAAG,IAAI,GAAG,kBAAkB,GAAG,IAAI,CA+F/F"}

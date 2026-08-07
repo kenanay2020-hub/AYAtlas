@@ -7,6 +7,7 @@
     "dev": "npm --workspace=@ayatlas/web run dev",
     "build:all": "turbo build",
     "test": "vitest run",
+    "verify": "npx tsx ./packages/ci-verifier/src/cli.ts",
     "typecheck": "turbo typecheck",
     "clean": "rimraf node_modules packages/*/dist packages/*/.turbo apps/*/.turbo apps/web/dist"
   },

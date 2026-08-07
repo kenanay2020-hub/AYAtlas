@@ -1,0 +1,1 @@
+{"version":3,"file":"repository-classifier.d.ts","sourceRoot":"","sources":["repository-classifier.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,YAAY,GACpB,QAAQ,GACR,YAAY,GACZ,MAAM,GACN,WAAW,GACX,QAAQ,GACR,QAAQ,GACR,gBAAgB,GAChB,eAAe,CAAC;AAEpB,qBAAa,cAAc;IACzB,QAAQ,CAAC,QAAQ,EAAE,MAAM,GAAG,YAAY;IAkFxC,sBAAsB,CAAC,QAAQ,EAAE,YAAY,GAAG,OAAO;CAGxD"}

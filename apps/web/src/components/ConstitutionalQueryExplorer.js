@@ -1,0 +1,42 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useState } from 'react';
+import { HelpCircle, Search, FileText, CheckCircle2, ShieldCheck, ArrowRight, Code, AlertOctagon, Eye } from 'lucide-react';
+import { ConstitutionalQueryEngine } from '@ayatlas/query-engine';
+import { useSnapshotContext } from '../context/SnapshotContext';
+export const ConstitutionalQueryExplorer = ({ headSha }) => {
+    const { snapshot, sourceMode } = useSnapshotContext();
+    const [queryInput, setQueryInput] = useState('Semantic CLI neden aktif yetkiye sahip değil?');
+    const [answer, setAnswer] = useState(() => {
+        const engine = new ConstitutionalQueryEngine();
+        return engine.askConstitutionalQuery('Semantic CLI neden aktif yetkiye sahip değil?', snapshot || undefined, headSha);
+    });
+    const presetQueries = [
+        'Semantic CLI neden aktif yetkiye sahip değil?',
+        'BCIB ikili komut formatı doğrulanmış mı?',
+        'Spatial Memory mimarisi depoda uygulanmış mı?',
+        'Validator PASS neden accepted evidence kabul edilmez?',
+        'Ring3 koduna otomatik yetki verilebilir mi?',
+    ];
+    const handleAsk = (qText) => {
+        setQueryInput(qText);
+        const engine = new ConstitutionalQueryEngine();
+        const res = engine.askConstitutionalQuery(qText, snapshot || undefined, headSha);
+        setAnswer(res);
+    };
+    const getStatusBadge = (status) => {
+        switch (status) {
+            case 'SUPPORTED':
+                return (_jsxs("span", { className: "flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30", children: [_jsx(CheckCircle2, { className: "h-3.5 w-3.5" }), _jsx("span", { children: "SUPPORTED EVIDENCE" })] }));
+            case 'PARTIAL':
+                return (_jsxs("span", { className: "flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-mono font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/30", children: [_jsx(ShieldCheck, { className: "h-3.5 w-3.5" }), _jsx("span", { children: "BOUNDED / PARTIAL" })] }));
+            case 'CONTRADICTORY':
+                return (_jsxs("span", { className: "flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-mono font-bold bg-red-500/10 text-red-400 border border-red-500/30", children: [_jsx(AlertOctagon, { className: "h-3.5 w-3.5" }), _jsx("span", { children: "CONTRADICTORY INVARIANT" })] }));
+            case 'VISION_ONLY':
+                return (_jsxs("span", { className: "flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30", children: [_jsx(Eye, { className: "h-3.5 w-3.5" }), _jsx("span", { children: "FUTURE VISION ONLY" })] }));
+            default:
+                return (_jsx("span", { className: "flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700", children: _jsx("span", { children: "EVALUATED" }) }));
+        }
+    };
+    return (_jsxs("div", { className: "p-6 max-w-7xl mx-auto space-y-6 font-mono", children: [_jsxs("div", { className: "flex items-center justify-between", children: [_jsxs("div", { children: [_jsxs("h2", { className: "text-xl font-bold text-slate-100 flex items-center space-x-2", children: [_jsx(HelpCircle, { className: "h-5 w-5 text-cyan-400" }), _jsx("span", { children: "Constitutional Natural Language & Code Query Console" })] }), _jsx("p", { className: "text-xs text-slate-400 mt-1", children: "Grounded architectural answers bound to exact file trees, live code snippets, SHA-256 manifest digests, and reasoning paths." })] }), _jsx("div", { className: "flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800 text-xs", children: _jsxs("span", { children: ["Source Mode: ", _jsx("strong", { className: "text-cyan-400", children: sourceMode.toUpperCase() })] }) })] }), _jsxs("div", { className: "glass-panel p-5 border-slate-800 space-y-4", children: [_jsxs("div", { className: "flex items-center space-x-3", children: [_jsxs("div", { className: "relative flex-1", children: [_jsx(Search, { className: "absolute left-3 top-3 h-4 w-4 text-slate-400" }), _jsx("input", { type: "text", value: queryInput, onChange: (e) => setQueryInput(e.target.value), onKeyDown: (e) => e.key === 'Enter' && handleAsk(queryInput), placeholder: "Ask any architectural, code, or governance question...", className: "w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-cyan-500/50" })] }), _jsx("button", { onClick: () => handleAsk(queryInput), className: "px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition-all shadow-md", children: "Ask Engine" })] }), _jsxs("div", { className: "flex flex-wrap items-center gap-2 pt-2", children: [_jsx("span", { className: "text-[11px] text-slate-400", children: "Preset Queries:" }), presetQueries.map((pq, idx) => (_jsx("button", { onClick: () => handleAsk(pq), className: "text-[11px] bg-slate-950 hover:bg-slate-800 text-slate-300 px-3 py-1 rounded-lg border border-slate-800 transition-colors", children: pq }, idx)))] })] }), answer && (_jsxs("div", { className: "glass-panel p-6 border-slate-800 space-y-6", children: [_jsxs("div", { className: "flex items-center justify-between border-b border-slate-800 pb-3", children: [_jsxs("div", { className: "flex items-center space-x-3", children: [_jsx(ShieldCheck, { className: "h-5 w-5 text-emerald-400" }), _jsxs("div", { children: [_jsx("h3", { className: "font-bold text-sm text-slate-100", children: "Grounded Answer Package" }), _jsx("div", { className: "text-[10px] text-slate-400", children: answer.conclusion })] })] }), getStatusBadge(answer.status)] }), _jsxs("div", { className: "space-y-3 text-xs", children: [_jsxs("div", { children: [_jsx("span", { className: "text-slate-400 text-[11px]", children: "T\u00FCrk\u00E7e A\u00E7\u0131klama (Summary):" }), _jsx("p", { className: "mt-1 text-slate-100 font-bold leading-relaxed bg-slate-950 p-4 rounded-xl border border-slate-800 text-sm", children: answer.answerSummaryTr })] }), _jsxs("div", { children: [_jsx("span", { className: "text-slate-400 text-[11px]", children: "English Technical Summary:" }), _jsx("p", { className: "mt-1 text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800", children: answer.answerSummaryEn })] })] }), answer.codeSnippet && (_jsxs("div", { className: "space-y-2 text-xs", children: [_jsxs("div", { className: "flex items-center space-x-2 text-slate-300 font-bold", children: [_jsx(Code, { className: "h-4 w-4 text-cyan-400" }), _jsx("span", { children: "Grounded Code Snippet Reference:" })] }), _jsx("pre", { className: "bg-slate-950 p-4 rounded-xl border border-slate-800 text-cyan-300 text-xs font-mono overflow-x-auto leading-relaxed", children: answer.codeSnippet })] })), _jsxs("div", { className: "space-y-2 text-xs", children: [_jsx("span", { className: "text-slate-400 text-[11px]", children: "Reasoning Chain Path:" }), _jsx("div", { className: "space-y-1", children: answer.reasoningChain.map((step, idx) => (_jsxs("div", { className: "flex items-center space-x-2 text-cyan-300 bg-slate-950 p-2.5 rounded-lg border border-slate-800", children: [_jsx(ArrowRight, { className: "h-3.5 w-3.5 text-cyan-400 flex-shrink-0" }), _jsx("span", { children: step })] }, idx))) })] }), _jsxs("div", { className: "space-y-2 text-xs", children: [_jsxs("span", { className: "text-slate-400 text-[11px]", children: ["Grounded Repository Files (", answer.groundedFiles.length, " matched):"] }), _jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: answer.groundedFiles.map((gf, idx) => (_jsxs("div", { className: "p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1", children: [_jsxs("div", { className: "flex items-center space-x-2 text-slate-200 font-bold", children: [_jsx(FileText, { className: "h-3.5 w-3.5 text-cyan-400" }), _jsx("span", { children: gf.path })] }), _jsxs("div", { className: "text-[10px] text-cyan-400 truncate", children: ["Digest: ", gf.digest] })] }, idx))) })] })] }))] }));
+};
+//# sourceMappingURL=ConstitutionalQueryExplorer.js.map

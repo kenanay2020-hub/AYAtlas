@@ -41,7 +41,7 @@ jobs:
         run: npm test
 
       - name: Run 5-Gate Constitutional CI Enforcer (Real Repository Source)
-        run: npx ayatlas-verify --source local --path .
+        run: npx tsx ./packages/ci-verifier/src/cli.ts --source local --path .
 
   deploy:
     name: Deploy AYAtlas Web Dashboard to GitHub Pages
