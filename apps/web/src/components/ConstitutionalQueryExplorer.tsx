@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HelpCircle, Search, FileText, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-react';
+import { HelpCircle, Search, FileText, CheckCircle2, ShieldCheck, ArrowRight, Code, AlertOctagon, Eye } from 'lucide-react';
 import { ConstitutionalQueryEngine, ConstitutionalAnswerPackage } from '@ayatlas/query-engine';
 import { useSnapshotContext } from '../context/SnapshotContext';
 
@@ -13,9 +13,10 @@ export const ConstitutionalQueryExplorer: React.FC<{ headSha: string }> = ({ hea
 
   const presetQueries = [
     'Semantic CLI neden aktif yetkiye sahip değil?',
-    'Phase-24 neye izin veriyor?',
-    'Validator PASS neden accepted evidence değil?',
-    'Bu commit ABI sınırını değiştirdi mi?',
+    'BCIB ikili komut formatı doğrulanmış mı?',
+    'Spatial Memory mimarisi depoda uygulanmış mı?',
+    'Validator PASS neden accepted evidence kabul edilmez?',
+    'Ring3 koduna otomatik yetki verilebilir mi?',
   ];
 
   const handleAsk = (qText: string) => {
@@ -25,6 +26,45 @@ export const ConstitutionalQueryExplorer: React.FC<{ headSha: string }> = ({ hea
     setAnswer(res);
   };
 
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'SUPPORTED':
+        return (
+          <span className="flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            <span>SUPPORTED EVIDENCE</span>
+          </span>
+        );
+      case 'PARTIAL':
+        return (
+          <span className="flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-mono font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/30">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            <span>BOUNDED / PARTIAL</span>
+          </span>
+        );
+      case 'CONTRADICTORY':
+        return (
+          <span className="flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-mono font-bold bg-red-500/10 text-red-400 border border-red-500/30">
+            <AlertOctagon className="h-3.5 w-3.5" />
+            <span>CONTRADICTORY INVARIANT</span>
+          </span>
+        );
+      case 'VISION_ONLY':
+        return (
+          <span className="flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+            <Eye className="h-3.5 w-3.5" />
+            <span>FUTURE VISION ONLY</span>
+          </span>
+        );
+      default:
+        return (
+          <span className="flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700">
+            <span>EVALUATED</span>
+          </span>
+        );
+    }
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 font-mono">
       {/* Header */}
@@ -32,10 +72,10 @@ export const ConstitutionalQueryExplorer: React.FC<{ headSha: string }> = ({ hea
         <div>
           <h2 className="text-xl font-bold text-slate-100 flex items-center space-x-2">
             <HelpCircle className="h-5 w-5 text-cyan-400" />
-            <span>Constitutional Natural Language Query Console</span>
+            <span>Constitutional Natural Language & Code Query Console</span>
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Grounded architectural answers bound to exact file trees, SHA-256 manifest digests, and reasoning paths.
+            Grounded architectural answers bound to exact file trees, live code snippets, SHA-256 manifest digests, and reasoning paths.
           </p>
         </div>
 
@@ -54,7 +94,7 @@ export const ConstitutionalQueryExplorer: React.FC<{ headSha: string }> = ({ hea
               value={queryInput}
               onChange={(e) => setQueryInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAsk(queryInput)}
-              placeholder="Ask any architectural or governance question..."
+              placeholder="Ask any architectural, code, or governance question..."
               className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-cyan-500/50"
             />
           </div>
@@ -85,19 +125,20 @@ export const ConstitutionalQueryExplorer: React.FC<{ headSha: string }> = ({ hea
       {answer && (
         <div className="glass-panel p-6 border-slate-800 space-y-6">
           <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <ShieldCheck className="h-5 w-5 text-emerald-400" />
-              <h3 className="font-bold text-sm text-slate-100">Grounded Constitutional Answer Package</h3>
+              <div>
+                <h3 className="font-bold text-sm text-slate-100">Grounded Answer Package</h3>
+                <div className="text-[10px] text-slate-400">{answer.conclusion}</div>
+              </div>
             </div>
-            <span className="text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-lg border border-emerald-500/40 font-bold">
-              STATUS: {answer.governanceStatus}
-            </span>
+            {getStatusBadge(answer.status)}
           </div>
 
           {/* Bilingual Answer Summaries */}
           <div className="space-y-3 text-xs">
             <div>
-              <span className="text-slate-400 text-[11px]">Türkçe Özet (Summary):</span>
+              <span className="text-slate-400 text-[11px]">Türkçe Açıklama (Summary):</span>
               <p className="mt-1 text-slate-100 font-bold leading-relaxed bg-slate-950 p-4 rounded-xl border border-slate-800 text-sm">
                 {answer.answerSummaryTr}
               </p>
@@ -110,6 +151,19 @@ export const ConstitutionalQueryExplorer: React.FC<{ headSha: string }> = ({ hea
               </p>
             </div>
           </div>
+
+          {/* Code Snippet Box (if available) */}
+          {answer.codeSnippet && (
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center space-x-2 text-slate-300 font-bold">
+                <Code className="h-4 w-4 text-cyan-400" />
+                <span>Grounded Code Snippet Reference:</span>
+              </div>
+              <pre className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-cyan-300 text-xs font-mono overflow-x-auto leading-relaxed">
+                {answer.codeSnippet}
+              </pre>
+            </div>
+          )}
 
           {/* Reasoning Chain */}
           <div className="space-y-2 text-xs">

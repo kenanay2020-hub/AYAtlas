@@ -5,12 +5,13 @@ export interface GroundedEvidenceReference {
     size: number;
     snippet?: string;
 }
+export type QueryAnswerStatus = 'SUPPORTED' | 'PARTIAL' | 'CONTRADICTORY' | 'VISION_ONLY' | 'UNKNOWN' | 'DEMO_SUPPORTED';
 export interface ConstitutionalAnswerPackage {
     queryText: string;
     commitSha: string;
     manifestDigest: string;
     sourceMode: string;
-    status: string;
+    status: QueryAnswerStatus;
     conclusion: string;
     appliedInvariants: string[];
     disclaimerNotice: string;
@@ -20,6 +21,8 @@ export interface ConstitutionalAnswerPackage {
     groundedFiles: GroundedEvidenceReference[];
     reasoningChain: string[];
     governanceStatus: 'RATIFIED' | 'UNDER_REVIEW' | 'REJECTED';
+    codeSnippet?: string;
+    matchedTechnicalSystem?: string;
 }
 export declare class ConstitutionalQueryEngine {
     askConstitutionalQuery(queryText: string, snapshot?: IngestedRepositorySnapshot, commitSha?: string): ConstitutionalAnswerPackage;
