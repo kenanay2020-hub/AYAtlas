@@ -1,4 +1,4 @@
-name: AYAtlas Constitutional CI & Verification
+name: AYAtlas Constitutional CI & GitHub Pages Deploy
 
 on:
   push:
@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
   verify:
@@ -31,5 +40,44 @@ jobs:
       - name: Run Vitest Unit Test Suite
         run: npm test
 
-      - name: Run 5-Gate Constitutional CI Enforcer
-        run: npx ayatlas-verify --sha d8018a2c3b4a5e6f7a8b9c0d1e2f3a4b5c6d7e8f
+      - name: Run 5-Gate Constitutional CI Enforcer (Real Repository Source)
+        run: npx ayatlas-verify --source local --path .
+
+  deploy:
+    name: Deploy AYAtlas Web Dashboard to GitHub Pages
+    needs: [verify]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Monorepo & Web App for GitHub Pages
+        run: GITHUB_PAGES=true npm run build:all
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './apps/web/dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,1 +1,1 @@
-export * from './ChangeIntelligence';
+export * from './ChangeIntelligence.js';

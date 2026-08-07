@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { CIVerifier } from './CIVerifier';
+import { CIVerifier } from './CIVerifier.js';
 
 async function main() {
   const args = process.argv.slice(2);

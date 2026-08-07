@@ -1,1 +1,1 @@
-export * from './CIVerifier';
+export * from './CIVerifier.js';

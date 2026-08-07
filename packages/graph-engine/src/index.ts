@@ -32,20 +32,36 @@ export interface GovernanceGraphNeighborhood {
   edges: GovernanceGraphEdge[];
 }
 
+export interface DynamicGraphBuildContext {
+  commitSha: string;
+  detectedPhase?: number;
+  files?: { path: string }[];
+  sourceAuthorityPolicy?: string;
+}
+
 export class GovernanceKnowledgeGraphEngine {
   private nodes: Map<string, GovernanceGraphNode> = new Map();
   private edges: GovernanceGraphEdge[] = [];
 
   constructor() {
-    this.initDefaultGraph();
+    this.initDefaultGraph('d8018a2c3b4a5e6f7a8b9c0d1e2f3a4b5c6d7e8f', 24);
   }
 
-  private initDefaultGraph() {
+  public buildGraph(ctx: DynamicGraphBuildContext) {
+    const commitSha = ctx.commitSha || 'd8018a2c3b4a5e6f7a8b9c0d1e2f3a4b5c6d7e8f';
+    const phase = ctx.detectedPhase || 24;
+    this.initDefaultGraph(commitSha, phase);
+  }
+
+  private initDefaultGraph(commitSha: string, phase: number) {
+    this.nodes.clear();
+    this.edges = [];
+
     const defaultSource: SourceReference = {
       sourceType: 'CANONICAL_DOCUMENT',
       repository: 'kenanay/AykenOS',
       ref: 'main',
-      headSha: 'd8018a2c3b4a5e6f7g8h9i0j',
+      headSha: commitSha,
       path: 'docs/roadmap/CURRENT_PHASE',
     };
 
@@ -69,11 +85,11 @@ export class GovernanceKnowledgeGraphEngine {
         sources: [defaultSource],
       },
       {
-        id: 'phase-24',
-        label: 'Phase-24: Accepted-Evidence Boundary Planning',
+        id: `phase-${phase}`,
+        label: `Phase-${phase}: Accepted-Evidence Boundary Planning`,
         nodeType: 'PHASE_DECISION',
         domain: 'Phase',
-        description: 'Current active phase defining exact-subject evidence expectations.',
+        description: `Current active phase (${phase}) defining exact-subject evidence expectations.`,
         authorityClass: 'CANONICAL',
         sources: [defaultSource],
       },
@@ -84,25 +100,25 @@ export class GovernanceKnowledgeGraphEngine {
         domain: 'ABI',
         description: 'Frozen syscall interface boundary between Ring0 and Ring3.',
         authorityClass: 'CANONICAL',
-        sources: [defaultSource],
+        sources: [{ ...defaultSource, path: 'shared/abi/syscalls.h' }],
       },
       {
         id: 'semantic-cli',
         label: 'Semantic CLI Component',
         nodeType: 'COMPONENT',
         domain: 'Runtime',
-        description: 'Ring3 intent interface. Bounded authority in Phase-24.',
+        description: `Ring3 intent interface. Bounded authority in Phase-${phase}.`,
         authorityClass: 'BOUNDED',
-        sources: [defaultSource],
+        sources: [{ ...defaultSource, path: 'userspace/semantic-cli/src/main.rs' }],
       },
       {
         id: 'evidence-exact-subject',
         label: 'Exact-Subject Binding Step',
         nodeType: 'EVIDENCE_STEP',
         domain: 'Evidence',
-        description: 'Binding candidate evidence to commit SHA d8018a2c...',
+        description: `Binding candidate evidence to locked commit SHA ${commitSha.slice(0, 8)}...`,
         authorityClass: 'EXACT_SUBJECT',
-        sources: [defaultSource],
+        sources: [{ ...defaultSource, path: 'docs/evidence/RATIFIED_CLAIMS.md' }],
       },
     ];
 
@@ -112,25 +128,25 @@ export class GovernanceKnowledgeGraphEngine {
 
     this.edges = [
       {
-        id: 'e-inv-phase24',
+        id: 'e-inv-phase',
         sourceId: 'inv-mechanism-policy',
-        targetId: 'phase-24',
+        targetId: `phase-${phase}`,
         relation: 'GOVERNS',
-        description: 'Constitutional invariant governs Phase-24 active scope.',
+        description: `Constitutional invariant governs Phase-${phase} active scope.`,
       },
       {
-        id: 'e-phase24-semantic',
-        sourceId: 'phase-24',
+        id: 'e-phase-semantic',
+        sourceId: `phase-${phase}`,
         targetId: 'semantic-cli',
         relation: 'BOUNDS',
-        description: 'Phase-24 explicitly bounds Semantic CLI authority.',
+        description: `Phase-${phase} explicitly bounds Semantic CLI authority.`,
       },
       {
-        id: 'e-phase24-evidence',
-        sourceId: 'phase-24',
+        id: 'e-phase-evidence',
+        sourceId: `phase-${phase}`,
         targetId: 'evidence-exact-subject',
         relation: 'RATIFIES',
-        description: 'Phase-24 planning establishes exact-subject binding rules.',
+        description: `Phase-${phase} planning establishes exact-subject binding rules.`,
       },
       {
         id: 'e-inv-evidence',

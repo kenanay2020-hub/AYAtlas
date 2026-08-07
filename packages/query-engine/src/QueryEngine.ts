@@ -43,12 +43,14 @@ export class ConstitutionalQueryEngine {
     const qLower = queryText.toLowerCase();
 
     // Grounded files extracted directly from active snapshot
-    const groundedFiles: GroundedEvidenceReference[] = snapshot?.files.map((f: any) => ({
-      path: f.path,
-      digest: f.contentDigest,
-      size: f.size,
-      snippet: f.content ? String(f.content).slice(0, 300) : undefined,
-    })) || [
+    const groundedFiles: GroundedEvidenceReference[] = (snapshot?.files && snapshot.files.length > 0)
+      ? snapshot.files.map((f: any) => ({
+          path: f.path,
+          digest: f.contentDigest,
+          size: f.size,
+          snippet: f.content ? String(f.content).slice(0, 300) : undefined,
+        }))
+      : [
       {
         path: 'docs/roadmap/CURRENT_PHASE',
         digest: 'sha256_e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
@@ -67,6 +69,18 @@ export class ConstitutionalQueryEngine {
         size: 512,
         snippet: 'pub struct BcibInstructionFrame { pub opcode: u16, pub payload: Vec<u8> }',
       },
+      {
+        path: 'userspace/semantic-cli/src/main.rs',
+        digest: 'sha256_cli',
+        size: 400,
+        snippet: 'pub const GRANTS_NEW_AUTHORITY: bool = false;',
+      },
+      {
+        path: 'proofd/src/main.rs',
+        digest: 'sha256_proofd',
+        size: 600,
+        snippet: 'fn verify_evidence_candidate(candidate: &EvidenceCandidate, commit_sha: &Sha256Digest)',
+      },
     ];
 
     const manifestDigest = snapshot?.identity.manifestDigest || 'sha256_manifest_digest_governance';
@@ -74,6 +88,7 @@ export class ConstitutionalQueryEngine {
 
     // 1. CONTRADICTORY Queries (Violating Core Invariants)
     if (qLower.includes('yetki ver') || qLower.includes('grant authority') || qLower.includes('ring3 kernel')) {
+      const phaseSource = groundedFiles.filter((f) => f.path.includes('CURRENT_PHASE'));
       return {
         queryText,
         commitSha,
@@ -83,10 +98,10 @@ export class ConstitutionalQueryEngine {
         conclusion: 'CRITICAL CONTRADICTION: Ring3 policy execution cannot grant runtime authority.',
         appliedInvariants: ['Newly Detected Code != Authority Grant', 'Ring0 vs Ring3 Isolation'],
         disclaimerNotice: 'Generated Explanation != Canonical Authority Decision Record',
-        directSources: groundedFiles.filter((f) => f.path.includes('CURRENT_PHASE')),
-        answerSummaryTr: 'ÇELIŞKI: Ring3 ortamında tespit edilen kodlar donanım yetkisi yaratamaz. yetki verme işlemi anayasal faz onayına bağlıdır.',
+        directSources: phaseSource,
+        answerSummaryTr: 'ÇELİŞKİ: Ring3 ortamında tespit edilen kodlar donanım yetkisi yaratamaz. Yetki verme işlemi anayasal faz onayına bağlıdır.',
         answerSummaryEn: 'CONTRADICTION: Code in Ring3 cannot create hardware authority. Authority grant requires ratified exact-subject governance approval.',
-        groundedFiles: groundedFiles.slice(0, 2),
+        groundedFiles: phaseSource,
         reasoningChain: [
           'Ring3 code detection -> VERIFIED',
           'Authority grant evaluation -> REJECTED (Invariant Violation)',
@@ -115,7 +130,7 @@ export class ConstitutionalQueryEngine {
         appliedInvariants: ['Vision Architecture != Verified Repository Implementation'],
         disclaimerNotice: 'Vision Architecture Spec != Active Executable Substrate',
         directSources: [],
-        answerSummaryTr: 'VIZYON (DOGRULANMADI): Uzamsal bellek (Spatial Memory), Voksel/Gaussian veri tipleri ve GPU zamanlayıcısı AykenOS gelecek vizyonudur; henüz aktif depoda doğrulanmamıştır.',
+        answerSummaryTr: 'VİZYON (DOĞRULANMADI): Uzamsal bellek (Spatial Memory), Voksel/Gaussian veri tipleri ve GPU zamanlayıcısı AykenOS gelecek vizyonudur; henüz aktif depoda doğrulanmamıştır.',
         answerSummaryEn: 'VISION ONLY (NOT VERIFIED): Spatial Memory, Scene Graph, Voxel/Gaussian types, and GPU Scheduler represent AykenOS future architecture vision; not yet verified in active repository snapshot.',
         groundedFiles: [],
         reasoningChain: [
@@ -129,9 +144,28 @@ export class ConstitutionalQueryEngine {
       };
     }
 
-    // 3. BCIB & ABDF Substrate Queries (SUPPORTED)
+    // 3. BCIB & ABDF Substrate Queries (SUPPORTED iff source file exists)
     if (qLower.includes('bcib') || qLower.includes('abdf') || qLower.includes('binary format') || qLower.includes('ikili')) {
-      const bcibFile = groundedFiles.find((f) => f.path.includes('bcib') || f.path.includes('abdf')) || groundedFiles[0];
+      const bcibFile = groundedFiles.find((f) => f.path.includes('bcib') || f.path.includes('abdf'));
+      if (!bcibFile) {
+        return {
+          queryText,
+          commitSha,
+          manifestDigest,
+          sourceMode,
+          status: 'UNKNOWN',
+          conclusion: 'BCIB/ABDF substrate files not found in active snapshot.',
+          appliedInvariants: ['Epistemic Truth Invariant: No Grounded Source != SUPPORTED'],
+          disclaimerNotice: 'Source Evidence Missing',
+          directSources: [],
+          answerSummaryTr: 'BİLİNMİYOR: BCIB/ABDF substrate dosyaları aktif repoda bulunamadığı için destek bilgisi üretilemedi.',
+          answerSummaryEn: 'UNKNOWN: BCIB/ABDF substrate files not located in active snapshot.',
+          groundedFiles: [],
+          reasoningChain: ['BCIB/ABDF keyword match -> OK', 'Snapshot source search -> NOT_FOUND', 'Result -> UNKNOWN'],
+          governanceStatus: 'UNDER_REVIEW',
+        };
+      }
+
       return {
         queryText,
         commitSha,
@@ -142,12 +176,12 @@ export class ConstitutionalQueryEngine {
         appliedInvariants: ['Typed ABDF Binary Format', 'Deterministic BCIB Instruction Representation'],
         disclaimerNotice: 'Generated Explanation != Canonical Authority Decision Record',
         directSources: [bcibFile],
-        answerSummaryTr: 'DOGRULANDI: BCIB (Binary Command & Instruction) ve ABDF (Typed Binary Data Format) AykenOS veri substratında aktif olarak doğrulanmıştır.',
+        answerSummaryTr: 'DOĞRULANDI: BCIB (Binary Command & Instruction) ve ABDF (Typed Binary Data Format) AykenOS veri substratında aktif olarak doğrulanmıştır.',
         answerSummaryEn: 'SUPPORTED: BCIB instruction representation and ABDF typed binary format are verified in active snapshot repository tree.',
         groundedFiles: [bcibFile],
         reasoningChain: [
           'BCIB/ABDF binary substrate lookup -> VERIFIED_IMPLEMENTATION',
-          'Repository path matching -> ayken-core/crates/bcib',
+          'Repository path matching -> ' + bcibFile.path,
           'Binary layout determinism -> PASSED',
         ],
         governanceStatus: 'RATIFIED',
@@ -156,9 +190,28 @@ export class ConstitutionalQueryEngine {
       };
     }
 
-    // 4. Semantic CLI Queries (PARTIAL / BOUNDED)
+    // 4. Semantic CLI Queries (PARTIAL / BOUNDED iff source file exists)
     if (qLower.includes('semantic cli') || qLower.includes('yetki')) {
-      const cliFile = groundedFiles.find((f) => f.path.includes('semantic-cli')) || groundedFiles[0];
+      const cliFile = groundedFiles.find((f) => f.path.includes('semantic-cli'));
+      if (!cliFile) {
+        return {
+          queryText,
+          commitSha,
+          manifestDigest,
+          sourceMode,
+          status: 'UNKNOWN',
+          conclusion: 'Semantic CLI source file not found in active snapshot.',
+          appliedInvariants: ['Epistemic Truth Invariant: No Grounded Source != SUPPORTED'],
+          disclaimerNotice: 'Source Evidence Missing',
+          directSources: [],
+          answerSummaryTr: 'BİLİNMİYOR: Semantic CLI kaynak dosyası aktif snapshot içerisinde bulunamadı.',
+          answerSummaryEn: 'UNKNOWN: Semantic CLI source file not found in active snapshot.',
+          groundedFiles: [],
+          reasoningChain: ['Semantic CLI keyword match -> OK', 'Snapshot search -> NOT_FOUND', 'Result -> UNKNOWN'],
+          governanceStatus: 'UNDER_REVIEW',
+        };
+      }
+
       return {
         queryText,
         commitSha,
@@ -183,9 +236,28 @@ export class ConstitutionalQueryEngine {
       };
     }
 
-    // 5. Validator & Evidence Queries (SUPPORTED)
+    // 5. Validator & Evidence Queries (SUPPORTED iff source file exists)
     if (qLower.includes('validator') || qLower.includes('evidence') || qLower.includes('kanıt') || qLower.includes('proofd')) {
-      const proofFile = groundedFiles.find((f) => f.path.includes('proofd') || f.path.includes('evidence')) || groundedFiles[0];
+      const proofFile = groundedFiles.find((f) => f.path.includes('proofd') || f.path.includes('evidence'));
+      if (!proofFile) {
+        return {
+          queryText,
+          commitSha,
+          manifestDigest,
+          sourceMode,
+          status: 'UNKNOWN',
+          conclusion: 'Proof/Evidence source files not found in active snapshot.',
+          appliedInvariants: ['Epistemic Truth Invariant: No Grounded Source != SUPPORTED'],
+          disclaimerNotice: 'Source Evidence Missing',
+          directSources: [],
+          answerSummaryTr: 'BİLİNMİYOR: Doğrulayıcı kanıt dosyaları aktif snapshot içerisinde bulunamadı.',
+          answerSummaryEn: 'UNKNOWN: Proof/Evidence source files not found in active snapshot.',
+          groundedFiles: [],
+          reasoningChain: ['Evidence keyword match -> OK', 'Snapshot search -> NOT_FOUND', 'Result -> UNKNOWN'],
+          governanceStatus: 'UNDER_REVIEW',
+        };
+      }
+
       return {
         queryText,
         commitSha,
@@ -196,7 +268,7 @@ export class ConstitutionalQueryEngine {
         appliedInvariants: ['Validator Output PASS != Accepted Evidence', 'Exact-Subject SHA Binding Required'],
         disclaimerNotice: 'Generated Explanation != Canonical Authority Decision Record',
         directSources: [proofFile],
-        answerSummaryTr: 'DOGRULANDI: proofd servisi testlerin PASS vermesini exact-subject commit SHA bağı ile eşleştirmekle yükümlüdür.',
+        answerSummaryTr: 'DOĞRULANDI: proofd servisi testlerin PASS vermesini exact-subject commit SHA bağı ile eşleştirmekle yükümlüdür.',
         answerSummaryEn: 'SUPPORTED: Validator PASS != Accepted Evidence. Accepted evidence requires exact-subject commit SHA binding under Phase-24 rules.',
         groundedFiles: [proofFile],
         reasoningChain: [
@@ -210,27 +282,27 @@ export class ConstitutionalQueryEngine {
       };
     }
 
-    // 6. Grounded Fallback Answer (SUPPORTED / DEMO_SUPPORTED)
+    // 6. Strict Grounded Fallback Answer (UNKNOWN if no direct evidence match)
     return {
       queryText,
       commitSha,
       manifestDigest,
       sourceMode,
-      status: 'SUPPORTED',
-      conclusion: 'Query evaluated under AykenOS Constitution.',
-      appliedInvariants: ['Read-Only Isolation Boundary', 'Deterministic Pipeline Invariant'],
-      disclaimerNotice: 'Generated Explanation != Canonical Authority Decision Record',
-      directSources: groundedFiles.slice(0, 3),
-      answerSummaryTr: `Sorgunuz AykenOS Anayasası (Faz-24) kapsamında incelendi. Depodaki ${groundedFiles.length} kaynak dosyasının manifest SHA-256 özeti (${manifestDigest.slice(0, 12)}...) doğrulandı.`,
-      answerSummaryEn: `Query evaluated under AykenOS Constitution. Evaluated ${groundedFiles.length} files with manifest SHA-256 digest (${manifestDigest.slice(0, 12)}...).`,
-      groundedFiles: groundedFiles.slice(0, 3),
+      status: 'UNKNOWN',
+      conclusion: 'No exact grounded source evidence found for this query in active repository snapshot.',
+      appliedInvariants: ['Epistemic Truth Invariant: No Grounded Source != SUPPORTED Answer'],
+      disclaimerNotice: 'Unmatched Query Domain',
+      directSources: [],
+      answerSummaryTr: `BİLİNMİYOR: Sorgunuza ilişkin doğrudan kanıt dosyası aktif snapshot (${manifestDigest.slice(0, 12)}...) içerisinde tespit edilemedi.`,
+      answerSummaryEn: `UNKNOWN: No direct source evidence matching this query was grounded in snapshot manifest (${manifestDigest.slice(0, 12)}...).`,
+      groundedFiles: [],
       reasoningChain: [
         'Grounded snapshot lookup -> COMPLETED',
-        'SHA-256 manifest integrity -> VERIFIED',
-        'Constitutional boundary check -> ACCEPTED',
+        'Direct evidence matching -> NOT_FOUND',
+        'Epistemic Rule Enforcement -> UNKNOWN',
       ],
-      governanceStatus: 'RATIFIED',
-      codeSnippet: '// Grounded File Manifest Reference:\n// Manifest SHA-256: ' + manifestDigest + '\n// Commit SHA: ' + commitSha,
+      governanceStatus: 'UNDER_REVIEW',
+      codeSnippet: '// Epistemic Invariant:\n// No Grounded Source != SUPPORTED Answer',
     };
   }
 }

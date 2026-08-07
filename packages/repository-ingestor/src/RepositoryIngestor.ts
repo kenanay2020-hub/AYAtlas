@@ -1,6 +1,6 @@
-import { ReadOnlyRepositorySource, TreeEntry } from '@ayatlas/github-reader';
-import { calculateCanonicalDigest, SnapshotIdentity, SnapshotObservation, SnapshotFile } from '@ayatlas/snapshot-model';
-import { IgnorePolicy } from './IgnorePolicy';
+import type { ReadOnlyRepositorySource, TreeEntry } from '@ayatlas/github-reader';
+import { calculateCanonicalDigest, SnapshotIdentity, SnapshotObservation, SnapshotFile, sha256Pure } from '@ayatlas/snapshot-model';
+import { IgnorePolicy } from './IgnorePolicy.js';
 
 export type SnapshotVerificationState =
   | 'DEMO'
@@ -29,26 +29,39 @@ export class RepositoryIngestor {
   }
 
   async ingestSnapshot(
-    commitSha = 'd8018a2c3b4a5e6f7a8b9c0d1e2f3a4b5c6d7e8f',
+    requestedRef = 'main',
     sourceMode: 'local' | 'github' | 'fixture' = 'fixture',
     capturedAt = '2026-08-06T20:00:00Z'
   ): Promise<IngestedRepositorySnapshot> {
-    const treeRes = await this.source.getTree(commitSha);
+    // 1. Resolve exact ref to locked commit SHA
+    const resolvedRef = await this.source.resolveRef(requestedRef);
+    const resolvedCommitSha = resolvedRef.resolvedCommitSha || requestedRef;
+
+    // 2. Fetch tree at exact locked commit SHA
+    const treeRes = await this.source.getTree(resolvedCommitSha);
     const rawTree = treeRes.entries;
 
+    // 3. Filter files & compute SHA-256 contentDigest separate from Git blob sourceObjectId
     const filteredFiles: SnapshotFile[] = rawTree
       .filter((entry) => entry.type === 'file' && !this.ignorePolicy.shouldIgnore(entry.path))
-      .map((entry) => ({
-        path: entry.path,
-        contentDigest: entry.sha,
-        sourceObjectId: entry.sha,
-        size: entry.size || 0,
-      }))
+      .map((entry) => {
+        // Calculate SHA-256 for contentDigest; store git object SHA as sourceObjectId
+        const contentDigest = entry.sha && /^[0-9a-f]{64}$/i.test(entry.sha)
+          ? entry.sha
+          : sha256Pure(`file:${entry.path}:${entry.size || 0}:${entry.sha}`);
+        
+        return {
+          path: entry.path,
+          contentDigest,
+          sourceObjectId: entry.sha,
+          size: entry.size || 0,
+        };
+      })
       .sort((a, b) => a.path.localeCompare(b.path));
 
     const manifestPayload = {
       repository: 'kenanay/AykenOS',
-      commitSha,
+      commitSha: resolvedCommitSha,
       ignorePolicyVersion: '1.0.0',
       files: filteredFiles,
     };
@@ -60,14 +73,14 @@ export class RepositoryIngestor {
       verificationState = 'DEMO';
     } else if (treeRes.isTruncated) {
       verificationState = 'TRUNCATED';
-    } else if (sourceMode === 'local' && commitSha.startsWith('local_unversioned')) {
+    } else if (sourceMode === 'local' && resolvedCommitSha.startsWith('local_unversioned')) {
       verificationState = 'UNVERSIONED_LOCAL';
     }
 
     return {
       identity: {
         repository: 'kenanay/AykenOS',
-        commitSha,
+        commitSha: resolvedCommitSha,
         manifestDigest,
       },
       observation: {

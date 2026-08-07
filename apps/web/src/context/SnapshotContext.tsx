@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { OfflineFixtureRepositorySource, GitHubReadOnlyRepositorySource, LocalReadOnlyRepositorySource, ReadOnlyRepositorySource } from '@ayatlas/github-reader';
 import { RepositoryIngestor, IngestedRepositorySnapshot } from '@ayatlas/repository-ingestor';
 import { GovernanceKnowledgeGraphEngine } from '@ayatlas/graph-engine';
+import { parsePhasePointer } from '@ayatlas/authority-resolver';
 
 export type SourceMode = 'fixture' | 'local' | 'github';
 
@@ -101,10 +102,23 @@ export const SnapshotProvider: React.FC<{ children: ReactNode }> = ({ children }
       const ingestedSnap = await ingestor.ingestSnapshot(headSha, sourceMode);
       setSnapshot(ingestedSnap);
 
-      // Dynamically extract Phase from snapshot files if present
+      // Dynamically extract Phase from snapshot files content if present
       const phaseFile = ingestedSnap.files.find((f) => f.path.includes('CURRENT_PHASE'));
       if (phaseFile) {
-        setDetectedPhase(24);
+        let content = phaseFile.content;
+        if (!content) {
+          try {
+            content = await source.getFile(phaseFile.path, headSha).then(res => res.content);
+          } catch {
+            // fallback
+          }
+        }
+        const parsed = parsePhasePointer(content);
+        if (parsed) {
+          setDetectedPhase(parsed.phase);
+        } else {
+          setDetectedPhase(24);
+        }
       }
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to ingest repository snapshot');

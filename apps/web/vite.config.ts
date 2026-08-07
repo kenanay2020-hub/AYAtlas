@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
+  base: process.env.GITHUB_PAGES ? '/AYAtlas/' : '/',
   plugins: [react()],
   resolve: {
     alias: {
@@ -18,6 +19,7 @@ export default defineConfig({
       '@ayatlas/change-intelligence': path.resolve(__dirname, '../../packages/change-intelligence/src/index.ts'),
       '@ayatlas/query-engine': path.resolve(__dirname, '../../packages/query-engine/src/index.ts'),
       '@ayatlas/drift-engine': path.resolve(__dirname, '../../packages/drift-engine/src/index.ts'),
+      '@ayatlas/ci-verifier': path.resolve(__dirname, '../../packages/ci-verifier/src/index.ts'),
     },
   },
   server: {

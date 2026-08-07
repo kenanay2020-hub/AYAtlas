@@ -1,10 +1,14 @@
-import { ReadOnlyRepositorySource } from '@ayatlas/github-reader';
+import type { ReadOnlyRepositorySource } from '@ayatlas/github-reader';
 import {
-  RepositorySnapshot,
-  DerivedArtifactEnvelope,
+  type RepositorySnapshot,
+  type DerivedArtifactEnvelope,
   createArtifactEnvelope,
 } from '@ayatlas/snapshot-model';
-import { KnowledgeNode, KnowledgeEdge, KnowledgeGraph, KnowledgeAssertion } from '@ayatlas/knowledge-model';
+import type { KnowledgeNode, KnowledgeEdge, KnowledgeGraph, KnowledgeAssertion } from '@ayatlas/knowledge-model';
+import { parsePhasePointer } from '@ayatlas/authority-resolver';
+import { FileClassifier } from './repository-classifier.js';
+
+export * from './repository-classifier.js';
 
 export interface Stage1Payload {
   rawFiles: { path: string; content: string; sha: string }[];
@@ -43,9 +47,11 @@ export interface PipelineExecutionResult {
 
 export class KnowledgePipelineEngine {
   private source: ReadOnlyRepositorySource;
+  private classifier: FileClassifier;
 
   constructor(source: ReadOnlyRepositorySource) {
     this.source = source;
+    this.classifier = new FileClassifier();
   }
 
   async runFullPipeline(ref = 'main'): Promise<PipelineExecutionResult> {
@@ -53,19 +59,27 @@ export class KnowledgePipelineEngine {
     const commitSha = snapshot.identity.commitSha;
     const repoName = snapshot.identity.repository;
 
-    // Stage 1: Raw Ingestion
+    // Stage 1: Ingest all relevant files using FileClassifier (removing tree.slice(0, 10))
     const treeRes = await this.source.getTree(ref);
     const tree = treeRes.entries;
     const rawFiles: { path: string; content: string; sha: string }[] = [];
 
-    for (const item of tree.slice(0, 10)) {
-      if (item.type === 'file') {
+    const relevantEntries = tree.filter((item) => {
+      if (item.type !== 'file') return false;
+      const category = this.classifier.classify(item.path);
+      return this.classifier.isRelevantForKnowledge(category);
+    });
+
+    for (const item of relevantEntries) {
+      try {
         const fileContent = await this.source.getFile(item.path, ref);
         rawFiles.push({
           path: item.path,
           content: fileContent.content,
           sha: fileContent.sha,
         });
+      } catch (_e) {
+        // Skip unreadable files safely
       }
     }
 
@@ -79,15 +93,36 @@ export class KnowledgePipelineEngine {
       generatedAt: '2026-08-06T20:00:00Z',
     });
 
-    // Stage 2: Indexing & Structuring
-    const currentPhaseContent = await this.source.getFile('docs/roadmap/CURRENT_PHASE', ref);
-    const phaseNumMatch = currentPhaseContent.content.match(/CURRENT_PHASE=(\d+)/);
-    const currentPhase = phaseNumMatch ? parseInt(phaseNumMatch[1], 10) : 24;
+    // Stage 2: Indexing & Structuring with robust phase parsing
+    let currentPhase = 24;
+    try {
+      const currentPhaseContent = await this.source.getFile('docs/roadmap/CURRENT_PHASE', ref);
+      const parsed = parsePhasePointer(currentPhaseContent.content);
+      if (parsed) {
+        currentPhase = parsed.phase;
+      }
+    } catch (_e) {
+      // fallback default
+    }
+
+    // Dynamically discover subsystems from ingested file paths
+    const subsystemSet = new Set<string>();
+    for (const file of rawFiles) {
+      const parts = file.path.split('/');
+      if (parts.length > 1) {
+        subsystemSet.add(parts[0]);
+      }
+    }
+
+    const discoveredSubsystems = Array.from(subsystemSet).map((name) => ({
+      name,
+      path: `${name}/`,
+    }));
 
     const s2Payload: Stage2Payload = {
       currentPhase,
-      phaseTitle: `Phase-${currentPhase} — Accepted-Evidence Boundary Planning`,
-      subsystems: [
+      phaseTitle: `Phase-${currentPhase} — Architecture Substrate Execution & Verification`,
+      subsystems: discoveredSubsystems.length > 0 ? discoveredSubsystems : [
         { name: 'bootloader', path: 'bootloader/' },
         { name: 'kernel', path: 'kernel/' },
         { name: 'shared-abi', path: 'shared/abi' },
@@ -105,7 +140,7 @@ export class KnowledgePipelineEngine {
       generatedAt: '2026-08-06T20:00:00Z',
     });
 
-    // Stage 3: Semantic Extraction
+    // Stage 3: Dynamic Entity & Relation Extraction
     const entities: KnowledgeNode[] = [
       {
         id: 'kernel-core',
@@ -118,15 +153,13 @@ export class KnowledgePipelineEngine {
           authority: 'ACTIVE_AUTHORITY',
           evidence: 'GOVERNANCE_REVIEWED',
         },
-        sources: [
-          {
-            sourceType: 'CANONICAL_DOCUMENT',
-            repository: repoName,
-            ref,
-            headSha: commitSha,
-            path: 'kernel/kernel.c',
-          },
-        ],
+        sources: rawFiles.filter(f => f.path.startsWith('kernel/')).slice(0, 3).map(f => ({
+          sourceType: 'CANONICAL_DOCUMENT' as const,
+          repository: repoName,
+          ref,
+          headSha: commitSha,
+          path: f.path,
+        })),
       },
       {
         id: 'syscall-abi',
@@ -139,15 +172,13 @@ export class KnowledgePipelineEngine {
           authority: 'FROZEN',
           evidence: 'GOVERNANCE_REVIEWED',
         },
-        sources: [
-          {
-            sourceType: 'CANONICAL_DOCUMENT',
-            repository: repoName,
-            ref,
-            headSha: commitSha,
-            path: 'shared/abi/syscall_nums.h',
-          },
-        ],
+        sources: rawFiles.filter(f => f.path.includes('abi')).slice(0, 3).map(f => ({
+          sourceType: 'CANONICAL_DOCUMENT' as const,
+          repository: repoName,
+          ref,
+          headSha: commitSha,
+          path: f.path,
+        })),
       },
     ];
 
@@ -196,7 +227,7 @@ export class KnowledgePipelineEngine {
         id: 'assert-1',
         subjectId: 'kernel-core',
         predicate: 'GOVERNED_BY',
-        objectId: 'phase-24',
+        objectId: `phase-${currentPhase}`,
         kind: 'CANONICAL_STATUS',
         confidence: 'EXACT',
         supportingSources: [],

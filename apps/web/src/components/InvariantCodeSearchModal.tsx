@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Code, ShieldCheck, FileText, ArrowRight, X, Terminal, CheckCircle2, Lock } from 'lucide-react';
+import { Search, Code, FileText, X } from 'lucide-react';
 import { useSnapshotContext } from '../context/SnapshotContext';
 
 interface InvariantCodeSearchModalProps {
@@ -19,7 +19,47 @@ export const InvariantCodeSearchModal: React.FC<InvariantCodeSearchModalProps> =
   const { snapshot, sourceMode, headSha } = useSnapshotContext();
   const [searchTerm, setSearchTerm] = useState<string>('grantsNewAuthority');
 
-  const substrateCodeFiles: CodeMatchResult[] = [
+  if (!isOpen) return null;
+
+  // Build dynamic search index from active snapshot files
+  const dynamicResults: CodeMatchResult[] = [];
+  if (snapshot?.files && snapshot.files.length > 0) {
+    const term = searchTerm.toLowerCase().trim();
+    for (const file of snapshot.files) {
+      const isPathMatch = file.path.toLowerCase().includes(term);
+      const content = file.content || '';
+      
+      if (content) {
+        const lines = content.split(/\r?\n/);
+        lines.forEach((line: string, idx: number) => {
+          if (line.toLowerCase().includes(term) || isPathMatch) {
+            let classification: 'VERIFIED_IMPLEMENTATION' | 'BOUNDED' | 'FROZEN_ABI' = 'VERIFIED_IMPLEMENTATION';
+            if (file.path.includes('abi')) classification = 'FROZEN_ABI';
+            else if (file.path.includes('cli') || file.path.includes('userspace')) classification = 'BOUNDED';
+
+            dynamicResults.push({
+              filePath: file.path,
+              matchedLineNumber: idx + 1,
+              codeSnippet: line.trim() || `[File Match: ${file.path}]`,
+              invariantRule: file.path.includes('CURRENT_PHASE') ? 'Current Phase Governance Binding' : 'Constitutional Substrate Contract',
+              classification,
+            });
+          }
+        });
+      } else if (isPathMatch) {
+        dynamicResults.push({
+          filePath: file.path,
+          matchedLineNumber: 1,
+          codeSnippet: `// File match in snapshot: ${file.path} (SHA-256: ${file.contentDigest.slice(0, 12)}...)`,
+          invariantRule: 'Active Snapshot Substrate Element',
+          classification: file.path.includes('abi') ? 'FROZEN_ABI' : 'VERIFIED_IMPLEMENTATION',
+        });
+      }
+    }
+  }
+
+  // Fallback defaults if no snapshot files or initial state
+  const fallbackResults: CodeMatchResult[] = [
     {
       filePath: 'userspace/semantic-cli/src/main.rs',
       matchedLineNumber: 42,
@@ -41,30 +81,16 @@ export const InvariantCodeSearchModal: React.FC<InvariantCodeSearchModalProps> =
       invariantRule: 'Invariance Rule 3: Exact-Subject Commit SHA Evidence Binding',
       classification: 'VERIFIED_IMPLEMENTATION',
     },
-    {
-      filePath: 'ayken-core/crates/bcib/src/lib.rs',
-      matchedLineNumber: 24,
-      codeSnippet: 'pub struct BCIBCommand {\n    pub opcode: u16,\n    pub payload_digest: [u8; 32],\n}',
-      invariantRule: 'Invariance Rule 2: Mechanism vs Policy Separation (Ring0 Kernel Substrate)',
-      classification: 'VERIFIED_IMPLEMENTATION',
-    },
-    {
-      filePath: 'docs/roadmap/CURRENT_PHASE',
-      matchedLineNumber: 1,
-      codeSnippet: 'Phase-24: Exact-Subject Evidence Planning\nStatus: ACTIVE & RATIFIED',
-      invariantRule: 'Current Phase Governance Binding',
-      classification: 'BOUNDED',
-    },
   ];
 
-  if (!isOpen) return null;
-
-  const filteredResults = substrateCodeFiles.filter(
-    (item) =>
-      item.filePath.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.codeSnippet.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.invariantRule.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const activeResults = dynamicResults.length > 0
+    ? dynamicResults.slice(0, 50)
+    : fallbackResults.filter(
+        (item) =>
+          item.filePath.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.codeSnippet.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.invariantRule.toLowerCase().includes(searchTerm.toLowerCase())
+      );
 
   const presetTerms = [
     'grantsNewAuthority',
@@ -125,17 +151,17 @@ export const InvariantCodeSearchModal: React.FC<InvariantCodeSearchModalProps> =
         {/* Search Results Stream */}
         <div className="p-5 flex-1 overflow-y-auto space-y-4">
           <div className="text-xs text-slate-400 flex items-center justify-between">
-            <span>Matched Code Lines ({filteredResults.length}):</span>
+            <span>Matched Code Lines ({activeResults.length}):</span>
             <span>Substrate Mode: <strong className="text-cyan-400">{sourceMode.toUpperCase()}</strong></span>
           </div>
 
-          {filteredResults.length === 0 ? (
+          {activeResults.length === 0 ? (
             <div className="p-8 text-center text-xs text-slate-500 space-y-2">
               <Code className="h-8 w-8 text-slate-600 mx-auto" />
               <div>No matching code lines found for "{searchTerm}".</div>
             </div>
           ) : (
-            filteredResults.map((result: CodeMatchResult, idx: number) => (
+            activeResults.map((result: CodeMatchResult, idx: number) => (
               <div key={idx} className="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-2 hover:border-cyan-500/40 transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 text-xs font-bold text-slate-200">

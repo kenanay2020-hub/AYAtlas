@@ -1,4 +1,6 @@
-export * from './phase-evidence';
+export * from './phase-evidence.js';
+export * from './phase-pointer-parser.js';
+import { parsePhasePointer } from './phase-pointer-parser.js';
 
 export type AuthorityDomain =
   | 'CURRENT_PHASE'
@@ -14,6 +16,7 @@ export interface AuthorityQuery {
   domain: AuthorityDomain;
   subjectId: string;
   snapshotId: string;
+  fileContent?: string;
 }
 
 export interface AuthorityResolution {
@@ -32,14 +35,16 @@ export interface AuthorityResolution {
 
 export class AuthorityResolver {
   resolve(query: AuthorityQuery): AuthorityResolution {
-    const { domain, subjectId } = query;
+    const { domain, subjectId, fileContent } = query;
 
     if (domain === 'CURRENT_PHASE') {
+      const parsed = parsePhasePointer(fileContent);
+      const phaseNum = parsed ? parsed.phase : 24;
       return {
-        value: 'CURRENT_PHASE=24',
+        value: `CURRENT_PHASE=${phaseNum}`,
         authorityClass: 'CANONICAL',
         sourceIds: ['docs/roadmap/CURRENT_PHASE'],
-        reasoningCode: 'PRIMARY_POINTER_FILE',
+        reasoningCode: parsed ? `PARSED_POINTER_${parsed.format.toUpperCase()}` : 'PRIMARY_POINTER_FILE',
         conflicts: [],
       };
     }

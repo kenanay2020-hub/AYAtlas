@@ -1,3 +1,3 @@
-export * from './IgnorePolicy';
-export * from './RepositoryIngestor';
+export * from './IgnorePolicy.js';
+export * from './RepositoryIngestor.js';
 export type { SnapshotFile } from '@ayatlas/snapshot-model';

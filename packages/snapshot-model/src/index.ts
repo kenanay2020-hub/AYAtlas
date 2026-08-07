@@ -25,6 +25,7 @@ export interface SnapshotFile {
   size: number;
   contentDigest: string;
   sourceObjectId?: string;
+  content?: string;
 }
 
 export interface RepositorySnapshot {
