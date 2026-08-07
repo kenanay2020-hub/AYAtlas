@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TopStatusBar } from './components/TopStatusBar';
 import { SidebarNavigation } from './components/SidebarNavigation';
+import { BreadcrumbNav } from './components/BreadcrumbNav';
 import { OverviewDashboard } from './components/OverviewDashboard';
 import { HealthDashboard } from './components/HealthDashboard';
 import { TimelineExplorer } from './components/TimelineExplorer';
@@ -20,7 +21,7 @@ import { SnapshotProvider, useSnapshotContext } from './context/SnapshotContext'
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('overview');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState<any | null>(null);
   const { headSha, snapshot, detectedPhase } = useSnapshotContext();
   const payloadDigest = snapshot?.identity.manifestDigest || 'sha256_digest_manifest';
@@ -39,9 +40,13 @@ function AppContent() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           isOpen={isSidebarOpen}
+          onCloseMobile={() => setIsSidebarOpen(false)}
         />
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+          {/* Breadcrumb Path Navigation Header */}
+          <BreadcrumbNav activeTab={activeTab} />
+
           {activeTab === 'overview' && (
             <OverviewDashboard
               currentPhase={detectedPhase}
