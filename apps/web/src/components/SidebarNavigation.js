@@ -1,5 +1,5 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { LayoutDashboard, Activity, GitCommit, Layers, Network, HelpCircle, AlertOctagon, GitBranch, ShieldCheck, Map, BookOpen, ChevronRight, UserCheck, Cpu, PlayCircle, X, } from 'lucide-react';
+import { LayoutDashboard, Activity, GitCommit, Layers, Network, HelpCircle, AlertOctagon, GitBranch, ShieldCheck, Map, BookOpen, ChevronRight, UserCheck, Cpu, PlayCircle, CheckSquare, X, } from 'lucide-react';
 export const SidebarNavigation = ({ activeTab, setActiveTab, isOpen, onCloseMobile, }) => {
     const menuGroups = [
         {
@@ -24,6 +24,7 @@ export const SidebarNavigation = ({ activeTab, setActiveTab, isOpen, onCloseMobi
         {
             groupTitle: 'ANALYZE',
             items: [
+                { id: 'ci-verifier', label: 'CI Verifier Gates', icon: CheckSquare },
                 { id: 'query', label: 'Constitutional Query', icon: HelpCircle },
                 { id: 'drift', label: 'Drift & Contradiction', icon: AlertOctagon },
                 { id: 'repo-intel', label: 'Repo Intelligence', icon: GitCommit },

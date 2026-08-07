@@ -10,6 +10,7 @@ export const TAB_MAP = {
     graph: { group: 'EXPLORE', label: 'Governance Graph' },
     phases: { group: 'EXPLORE', label: 'Phase Catalog' },
     evidence: { group: 'EXPLORE', label: 'Evidence Boundary' },
+    'ci-verifier': { group: 'ANALYZE', label: 'CI Verifier Gates' },
     query: { group: 'ANALYZE', label: 'Constitutional Query' },
     drift: { group: 'ANALYZE', label: 'Drift & Contradiction' },
     'repo-intel': { group: 'ANALYZE', label: 'Repo Intelligence' },

@@ -11,6 +11,7 @@ import { ExecutionFlowCanvas } from './components/ExecutionFlowCanvas';
 import { PhaseExplorer } from './components/PhaseExplorer';
 import { EvidenceExplorer } from './components/EvidenceExplorer';
 import { InteractiveGovernanceGraph } from './components/InteractiveGovernanceGraph';
+import { CIVerifierDashboard } from './components/CIVerifierDashboard';
 import { ConstitutionalQueryExplorer } from './components/ConstitutionalQueryExplorer';
 import { DriftExplorer } from './components/DriftExplorer';
 import { RepositoryIntelligence } from './components/RepositoryIntelligence';
@@ -98,6 +99,10 @@ function AppContent() {
 
           {activeTab === 'graph' && (
             <InteractiveGovernanceGraph />
+          )}
+
+          {activeTab === 'ci-verifier' && (
+            <CIVerifierDashboard />
           )}
 
           {activeTab === 'query' && (

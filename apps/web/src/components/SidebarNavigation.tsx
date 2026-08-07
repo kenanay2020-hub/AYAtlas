@@ -15,6 +15,7 @@ import {
   UserCheck,
   Cpu,
   PlayCircle,
+  CheckSquare,
   X,
 } from 'lucide-react';
 
@@ -54,6 +55,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
     {
       groupTitle: 'ANALYZE',
       items: [
+        { id: 'ci-verifier', label: 'CI Verifier Gates', icon: CheckSquare },
         { id: 'query', label: 'Constitutional Query', icon: HelpCircle },
         { id: 'drift', label: 'Drift & Contradiction', icon: AlertOctagon },
         { id: 'repo-intel', label: 'Repo Intelligence', icon: GitCommit },
@@ -85,7 +87,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         className="lg:hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 transition-opacity"
       />
 
-      {/* Sidebar Drawer Container (Fixed overlay on mobile, relative flow on desktop) */}
+      {/* Sidebar Drawer Container */}
       <aside className="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 min-h-screen lg:min-h-[calc(100vh-3.5rem)] font-mono shadow-2xl lg:shadow-none transition-transform">
         {/* Mobile Header with Close Button */}
         <div className="lg:hidden flex items-center justify-between p-4 border-b border-slate-800">
